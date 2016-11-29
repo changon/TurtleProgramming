@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+	<title>Programming!</title>
+
+	<!--Libraries-->
+	<!--p5.js, p5.gibber.js-->
+	<script language="javascript" src="./resources/p5.min.js"></script>
+	<script src="./resources/p5.gibber.min.js" type="text/javascript" charset="utf-8"></script>
+
+	<link rel="stylesheet" href="./resources/style.css">
+
+	<!--Ace-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js"></script>
+
+	<!--Highlight--><!--
+	<script src="./resources/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>-->
+</head>
+
+<body>
+	<script language="javascript" src="sketch.js"></script>
+
+	<!--Main wrap-->
+	<div id="main-wrap">
+		<!--Code-->
+		<div id="code">
+			<div id="editor"><!--Code goes here--></div>
+		</div>
+		<!--End code-->
+
+		<!--Output-->
+		<div id="output">
+			<!--Canvas will be inserted here-->
+		</div>
+		<!--End output-->
+	</div>
+	<!--End main wrap-->
+
+	<script>
+/* Load Ace editor */
+var editor = ace.edit("editor");
+editor.setOptions({
+	// editor.renderer
+	theme: "ace/theme/monokai",
+});
+
+editor.getSession().setOptions({
+	mode: "ace/mode/javascript",
+});
+
+window.addEventListener("resize", function() {
+	editor.resize();
+	// TODO: resize p5 canvas as well
+});
+	</script>
+
+</body>
+</html>
