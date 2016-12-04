@@ -22,14 +22,19 @@ document.body.addEventListener("keydown", function(event) {
 	var key = event.key;
 
 	if (ctrlPressed && key=="Enter") {
-		console.log("HI");
+		console.log("Executing code");
 		render(iframe);
 	}
 });
 
 /* Helper functions */
 function render(iframe) {
-	var js_code = editor.getValue();
+	// TODO: Get whole text or just selected text?
+	// var js_code = editor.getValue();
+	// Get selection, otherwise get current line
+	// TODO flash
+	var js_code = editor.getSelectedText();
+	js_code = js_code ? js_code : editor.session.getLine(editor.getCursorPosition().row);
 
 	// Use iframe's contentWindow as namespace
 	var w = iframe.contentWindow;

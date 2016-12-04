@@ -112,7 +112,7 @@ Turtle.prototype.update = function() {
 
 Turtle.prototype.draw = function() {
 	// Clear canvas
-	background(64);
+	background(bgcolor);
 
 	// Make relative to origin
 	push();
@@ -232,13 +232,14 @@ Turtle.prototype.debug = function() {
 
 var t = new Turtle();
 var canvas;
+var bgcolor = 200; // 64
 var message = "";
 
 // var sketch = {};
 // sketch.setup = function(p) {
 function setup(p) {
 	canvas = createCanvas(windowWidth, windowHeight);
-	background(64);
+	background(bgcolor);
 	noFill();
 	stroke(10,0,0,127);
 
@@ -254,7 +255,10 @@ function draw(p) {
 		t.debug();
 
 		// TODO change coords. change to div?
+		push();
+		fill(0);
 		text(message, 50, height - 50);
+		pop();
 	}
 
 	t.update();
