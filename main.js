@@ -9,6 +9,11 @@ $.get(url, function(data) {
 // });
 editor.clearSelection();
 
+var iframe = document.querySelector("#output-iframe");
+init_sandbox(iframe);
+
+// Event listeners
+// Body keydown listener
 // $("body").keydown(function(event) {
 document.body.addEventListener("keydown", function(event) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
@@ -21,9 +26,6 @@ document.body.addEventListener("keydown", function(event) {
 		render(iframe);
 	}
 });
-
-var iframe = document.querySelector("#output-iframe");
-init_sandbox(iframe);
 
 /* Helper functions */
 function render(iframe) {
