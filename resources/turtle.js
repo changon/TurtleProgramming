@@ -257,7 +257,9 @@ function draw(p) {
 		// TODO change coords. change to div?
 		push();
 		fill(0);
-		text(message, 50, height - 50);
+		var m = message;
+		if (isMacroRecording) { m = "Macro recording -- " + m; }
+		text(m, 50, height - 50);
 		pop();
 	}
 
@@ -288,6 +290,8 @@ var macro_old = [];
 var isMacroRecording = false;
 
 function parseKey(key) {
+	var addToMacro = true;
+
 	switch(key) {
 		// Special keys
 		case BACKSPACE:
@@ -303,10 +307,10 @@ function parseKey(key) {
 			break;
 
 		// WASD and hjkl bindings
-		case 'w': case 'k': t.forward(countPrefix ? countPrefix : 10); countPrefix = 0; break;
-		case 's': case 'j': t.backward(countPrefix ? countPrefix : 10); countPrefix = 0; break;
-		case 'd': case 'l': t.right(countPrefix ? countPrefix : 10); countPrefix = 0; break;
-		case 'a': case 'h': t.left(countPrefix ? countPrefix : 10); countPrefix = 0; break;
+		case 'w': case 'k': t.forward(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 's': case 'j': t.backward(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 'd': case 'l': t.right(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 'a': case 'h': t.left(countPrefix ? countPrefix : 20); countPrefix = 0; break;
 
 		case 'c': t.clear(); break;
 		case 'r': t.reset(); break;
@@ -318,24 +322,30 @@ function parseKey(key) {
 			// Record if stopped, Stop if recording
 			if (isMacroRecording) { stopRecordingMacro(); }
 			else { recordMacro(); }
+			addToMacro = false;
 			break;
 
 		case '@':
 			repeat(countPrefix ? countPrefix : 1, function() { playMacro(); });
+			addToMacro = false;
 			break;
 
-		default: logText("Key pressed: " + key);
+		default:
+			logText("Unknown command: " + key);
+			addToMacro = false;
 	}
 
-	// Record macro, not recording the 'q' or '@' keys
-	if (isMacroRecording && key != 'q' && key != '@') {
+	// Record macro, not recording the 'q' or '@' keys or unknown keys
+	if (addToMacro) {
 		macro.push(key);
-		logText("Pushed:" + key)// TODO
 	}
 }
 
 function keyPressed() {
-	parseKey(keyCode);
+	// Only parse backspace
+	if (keyCode == BACKSPACE) {
+		parseKey(keyCode);
+	}
 }
 
 function keyTyped() {
@@ -344,21 +354,21 @@ function keyTyped() {
 
 // TODO: make macros not based on keypress
 function recordMacro() {
-	logText("Macro recording");
+	logText(""); // trigger refresh
 	isMacroRecording = true;
 	macro_old = macro;
 	macro = [];
 }
 
 function stopRecordingMacro() {
-	logText("Macro recorded: " + macro);
+	logText("Macro recorded: " + macro.join(''));
 	isMacroRecording = false;
 }
 
 function playMacro() {
 	// Don't play the current macro when currently recording a macro
 	if (!isMacroRecording) { // TODO
-		logText("Playing macro: " + macro);
+		logText("Playing macro: " + macro.join(''));
 		for (var i in macro) {
 			parseKey(macro[i]);
 		}

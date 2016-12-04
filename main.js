@@ -1,13 +1,30 @@
 "use strict";
 
-// Get contentsof sketch.js without running
-// function readFileFromURL(url)
-var url = "sketch.js";
-$.get(url, function(data) {
-	editor.setValue(data);
-}, "text");
-// });
-editor.clearSelection();
+/* Helpers */
+// Get contents of sketch.js without running
+function readFileFromURL(url) {
+	$.get(url, function(data) {
+		editor.setValue(data, -1); // Replace everything
+	}, "text");
+}
+
+// Read a page's GET URL variables and return them as an associative array.
+// From http://stackoverflow.com/a/4656873
+function getURLVars() {
+	var vars = [], hash;
+	var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	for(var i = 0; i < hashes.length; i++) {
+		hash = hashes[i].split('=');
+		vars.push(hash[0]);
+		vars[hash[0]] = hash[1];
+	}
+	return vars;
+}
+
+// TODO this is ugly
+var urlVars = getURLVars();
+var program = urlVars["program"] || "sketch";
+readFileFromURL("./sketches/" + program + ".js");
 
 var iframe = document.querySelector("#output-iframe");
 init_sandbox(iframe);
@@ -22,17 +39,18 @@ document.body.addEventListener("keydown", function(event) {
 	var key = event.key;
 
 	if (ctrlPressed && key=="Enter") {
-		console.log("Executing code");
 		render(iframe);
 	}
 });
 
 /* Helper functions */
 function render(iframe) {
+	console.log("Executing code");
+
 	// TODO: Get whole text or just selected text?
 	// var js_code = editor.getValue();
 	// Get selection, otherwise get current line
-	// TODO flash
+	// TODO flash code to run
 	var js_code = editor.getSelectedText();
 	js_code = js_code ? js_code : editor.session.getLine(editor.getCursorPosition().row);
 
@@ -66,4 +84,14 @@ function init_sandbox(iframe) {
 	iframe.contentDocument.open();
 	iframe.contentDocument.write(html);
 	iframe.contentDocument.close();
+
+	// Autorun after a delay (this is so hackish)
+	// TODO replace with an event listener
+	if (urlVars["autorun"]) {
+		iframe.contentWindow.setTimeout(function() {
+			editor.selectAll();
+			render(iframe);
+			editor.clearSelection();
+		}, 500);
+	}
 }
