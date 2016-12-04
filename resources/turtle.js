@@ -10,7 +10,7 @@
  * ang is in degrees, not radians
  */
 var Turtle = function() {
-	// Position and bearing
+	// Position and heading
 	this.x = 0;
 	this.y = 0;
 	this.x_new = this.x;
@@ -20,6 +20,7 @@ var Turtle = function() {
 
 	// Appearance
 	this.isVisible = true;
+	this.isPenDown = true;
 
 	// Animation
 	this.scale = 0.5; // scale for lerp, between 0.0 and 1.0
@@ -37,23 +38,40 @@ Turtle.prototype.addCommand = function(cmd, args) {
 };
 
 Turtle.prototype.addVertex = function() {
-	this.vertices.push({type: "point", from: [this.x, this.y], to: [this.x_new, this.y_new]});
+	if (this.isPenDown) {
+		this.vertices.push({ type: "point", from: [this.x, this.y], to: [this.x_new, this.y_new] });
+	}
 };
 
 Turtle.prototype.addText = function(str) {
-	this.vertices.push({type: "text", str: str});
+	this.vertices.push({ type: "text", str: str, at: [this.x, this.y] });
 };
 
-// Turtle commands
+/* Turtle commands */
+// Move and draw
 Turtle.prototype.forward = function (n) { this.addCommand("forward", n); };
+Turtle.prototype.backward = function (n) { this.addCommand("backward", n); };
 Turtle.prototype.right = function (n) { this.addCommand("right", n); };
 Turtle.prototype.left = function (n) { this.addCommand("left", n); };
-Turtle.prototype.goto = function([x, y]) { this.addCommand("goto", [x, y]); }
+Turtle.prototype.setxy = function(x, y) { this.addCommand("setxy", [x, y]); }
+Turtle.prototype.setheading = function(ang) { this.addCommand("setheading", ang); }
+Turtle.prototype.write = function(str) { this.addCommand("write", str); }
+
+// Drawing state
 Turtle.prototype.show = function() { this.addCommand("show"); }
 Turtle.prototype.hide = function() { this.addCommand("hide"); }
 Turtle.prototype.clear = function() { this.addCommand("clear"); }
-Turtle.prototype.write = function(str) { this.addCommand("write", str); }
-// TODO: penup, pendown, stop, color
+Turtle.prototype.pendown = function() { this.addCommand("pendown"); }
+Turtle.prototype.penup = function() { this.addCommand("penup"); }
+
+Turtle.prototype.reset = function() { this.clear(); this.setxy(0, 0); this.setheading(90); }
+
+// Aliases
+Turtle.prototype.goto = Turtle.prototype.setxy;
+
+// TODO: stop, color
+// TODO: push, pop context
+// TODO: commandHistory, undo
 
 Turtle.prototype.update = function() {
 	// If turtle is visible, do all the fancy animation stuff
@@ -101,7 +119,7 @@ Turtle.prototype.draw = function() {
 	translate(width/2, height/2);
 
 	// Draw vertices
-	// TODO: add support for different types
+	// TODO: rename this.vertices
 	for (var i = 1; i < this.vertices.length; i++) {
 		var vertex = this.vertices[i];
 		if (vertex.type == "point") {
@@ -112,7 +130,10 @@ Turtle.prototype.draw = function() {
 			line(x1, -y1, x2, -y2);
 		}
 		else if (vertex.type == "text") {
-			text(vertex.str, 0, 0);
+			push();
+			fill(255);
+			text(vertex.str, vertex.at[0], -vertex.at[1]);
+			pop();
 		}
 	}
 
@@ -140,58 +161,78 @@ Turtle.prototype.executeNextCommand = function() {
 		var args = command[1];
 		switch (cmd) {
 			case "forward":
-				console.log("Forward " + args);
+				logText("Forward " + args);
 				this.x_new = this.x + args * Math.cos(radians(this.ang));
 				this.y_new = this.y + args * Math.sin(radians(this.ang));
 				this.addVertex();
 				break;
+			case "backward":
+				logText("Backward " + args);
+				this.x_new = this.x - args * Math.cos(radians(this.ang));
+				this.y_new = this.y - args * Math.sin(radians(this.ang));
+				this.addVertex();
+				break;
 			case "right":
-				console.log("Right " + args);
+				logText("Right " + args);
 				this.ang_new = (this.ang - args);
 				break;
 			case "left":
-				console.log("Left " + args);
+				logText("Left " + args);
 				this.ang_new = (this.ang + args);
 				break;
-			case "goto":
-				console.log("Goto " + args);
+			case "setxy":
+				logText("Set [x, y] to " + args);
 				this.x_new = args[0];
 				this.y_new = args[1];
 				break;
+			case "setheading":
+				logText("Set heading to " + args);
+				this.ang_new = args;
+				break;
 			case "hide":
-				console.log("Hide");
+				log("Hide");
 				this.isVisible = false;
 				break;
 			case "show":
-				console.log("Show");
+				logText("Show");
 				this.isVisible = true;
 				break;
 			case "clear":
-				console.log("Clear");
+				logText("Clear");
 				this.vertices = [];
 				this.addVertex();
 				break;
 			case "write":
-				console.log('Write "' + args + '"');
+				logText('Write "' + args + '"');
 				this.addText(args);
+				break;
+			case "pendown":
+				logText("Pen down");
+				this.isPenDown = true;
+				break;
+			case "penup":
+				logText("Pen up");
+				this.isPenDown = false;
 				break;
 		}
 	}
 }
 
 Turtle.prototype.debug = function() {
-	// TODO: print on screen,  debug mode
-	console.log("Command finished: " + this.commandFinished); // debug
-	console.log("x: " + t.x); // debug
-	console.log("y: " + t.y); // debug
-	console.log("ang: " + t.ang); // debug
-	console.log("x_new: " + t.x_new); // debug
-	console.log("y_new: " + t.y_new); // debug
-	console.log("ang_new: " + t.ang_new); // debug
+	if (t.isDebug) {
+		var s = "";
+		s += "Position: " + [t.x, t.y] + "\n";
+		s += "Heading: " + t.ang + "\n";
+		s += "New position" + [t.x_new, t.y_new] + "\n";
+		s += "New heading" + t.ang_new + "\n";
+
+		text(s, 50, 50); // TODO change coords, fix multiline
+	}
 };
 
 var t = new Turtle();
 var canvas;
+var message = "";
 
 // var sketch = {};
 // sketch.setup = function(p) {
@@ -207,12 +248,16 @@ function setup(p) {
 
 // sketch.draw = function(p) {
 function draw(p) {
-	t.update();
-
 	// Redraw only if dirty
 	if (!t.commandFinished) {
 		t.draw();
+		t.debug();
+
+		// TODO change coords. change to div?
+		text(message, 50, height - 50);
 	}
+
+	t.update();
 }
 
 // Initialize instance mode
@@ -227,26 +272,107 @@ function repeat(n, f) {
 /* Interative etch-a-sketch mode
  * Specify count with number keys (0-9)
  * Move turtle with WASD or hjkl
+ *
+ * c: clear()
+ * r: reset()
+ * ,: pendown()
+ * .: penup()
  */
 var countPrefix = 0;
-function keyPressed() {
-	console.log(key)
+var macro = [];
+var macro_old = [];
+var isMacroRecording = false;
+
+function parseKey(key) {
 	switch(key) {
+		// Special keys
+		case BACKSPACE:
+			countPrefix = 0;
+			logText("Count prefix: " + countPrefix);
+			break;
+
 		// Number keys
 		case '0': case '1': case '2': case '3': case '4':
 		case '5': case '6': case '7': case '8': case '9':
-			console.log(countPrefix);
 			countPrefix = countPrefix * 10 + parseInt(key);
+			logText("Count prefix: " + countPrefix);
 			break;
 
 		// WASD and hjkl bindings
-		case 'W': case 'K': t.forward(countPrefix ? countPrefix : 10); countPrefix = 0; break;
-		case 'A': case 'H': t.left(countPrefix ? countPrefix : 10); countPrefix = 0; break;
-		case 'D': case 'L': t.right(countPrefix ? countPrefix : 10); countPrefix = 0; break;
+		case 'w': case 'k': t.forward(countPrefix ? countPrefix : 10); countPrefix = 0; break;
+		case 's': case 'j': t.backward(countPrefix ? countPrefix : 10); countPrefix = 0; break;
+		case 'd': case 'l': t.right(countPrefix ? countPrefix : 10); countPrefix = 0; break;
+		case 'a': case 'h': t.left(countPrefix ? countPrefix : 10); countPrefix = 0; break;
 
-		case ',': t.pendown(); break;
-		case '.': t.penup(); break;
+		case 'c': t.clear(); break;
+		case 'r': t.reset(); break;
+		case ',': case '¼': t.pendown(); break; // Comma
+		case '.': case '¾': t.penup(); break; // Period
+
+		// Macro
+		case 'q':
+			// Record if stopped, Stop if recording
+			if (isMacroRecording) { stopRecordingMacro(); }
+			else { recordMacro(); }
+			break;
+
+		case '@':
+			repeat(countPrefix ? countPrefix : 1, function() { playMacro(); });
+			break;
+
+		default: logText("Key pressed: " + key);
 	}
+
+	// Record macro, not recording the 'q' or '@' keys
+	if (isMacroRecording && key != 'q' && key != '@') {
+		macro.push(key);
+		logText("Pushed:" + key)// TODO
+	}
+}
+
+function keyPressed() {
+	parseKey(keyCode);
+}
+
+function keyTyped() {
+	parseKey(key);
+}
+
+// TODO: make macros not based on keypress
+function recordMacro() {
+	logText("Macro recording");
+	isMacroRecording = true;
+	macro_old = macro;
+	macro = [];
+}
+
+function stopRecordingMacro() {
+	logText("Macro recorded: " + macro);
+	isMacroRecording = false;
+}
+
+function playMacro() {
+	// Don't play the current macro when currently recording a macro
+	if (!isMacroRecording) { // TODO
+		logText("Playing macro: " + macro);
+		for (var i in macro) {
+			parseKey(macro[i]);
+		}
+	}
+	// Play the old macro instead
+	else {
+		logText("Playing old macro: " + macro_old);
+		for (var i in macro_old) {
+			parseKey(macro_old[i]);
+		}
+	}
+}
+
+// Log text to console and canvas
+function logText(str) {
+	t.commandFinished = false; // Set dirty flag and trigger refresh
+	console.log(str);
+	message = str;
 }
 
 /* Ideas

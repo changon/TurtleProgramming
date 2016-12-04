@@ -1,7 +1,5 @@
 // Press Cmd + Enter to run
 
-// Inspired by: http://berniepope.id.au/html/js-turtle/turtle.html
-
 function square(side) {
 	repeat(4, function () {
 		t.forward(side);
@@ -13,6 +11,13 @@ function star() {
 	repeat(36, function() {
 		t.forward(200);
 		t.left(170);
+	});
+}
+
+function polygon(n, s) {
+	repeat(n, function() {
+		t.forward(s);
+		t.left(360);
 	});
 }
 
@@ -31,6 +36,17 @@ function demo() {
 	t.show();
 }
 
-t.scale = 1
+function inputDemo() {
+	var name = prompt("What is your name?");
+	t.write("Hello, " + name + "!");
+
+	var sides = parseInt(prompt("I will draw you a shape. How many sides do you want?"));
+	polygon(sides, 50);
+}
+
+// Make turtle faster
+t.scale = 1;
+
 t.clear();
-demo()
+// demo();
+inputDemo();
