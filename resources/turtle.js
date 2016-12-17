@@ -67,7 +67,12 @@ Turtle.prototype.penup = function() { this.addCommand("penup"); }
 Turtle.prototype.reset = function() { this.clear(); this.setxy(0, 0); this.setheading(90); }
 
 // Aliases
+Turtle.prototype.fd = Turtle.prototype.forward;
+Turtle.prototype.bk = Turtle.prototype.back = Turtle.prototype.backward;
+Turtle.prototype.rt = Turtle.prototype.right;
+Turtle.prototype.lt = Turtle.prototype.left;
 Turtle.prototype.goto = Turtle.prototype.setxy;
+Turtle.prototype.seth = Turtle.prototype.setheading;
 
 // TODO: stop, color
 // TODO: push, pop context
@@ -117,6 +122,8 @@ Turtle.prototype.draw = function() {
 	// Make relative to origin
 	push();
 	translate(width/2, height/2);
+
+	// TODO perspective?
 
 	// Draw vertices
 	// TODO: rename this.vertices

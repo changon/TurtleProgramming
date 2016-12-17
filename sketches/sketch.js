@@ -6,7 +6,6 @@
  * accidentally sets it on fire, not that it would though...
  ***********************/
 
-/*
 // *Introduction*
 // Welcome to this programming tutorial!
 // Today we're going to be exploring turtle graphics. Yay!

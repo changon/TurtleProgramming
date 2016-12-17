@@ -1,5 +1,8 @@
 "use strict";
 
+// TODO add highlight
+// https://stackoverflow.com/questions/27531860/how-to-highlight-a-certain-line-in-ace-editor
+
 /* Helpers */
 // Get contents of sketch.js without running
 function readFileFromURL(url) {
