@@ -101,12 +101,17 @@ Turtle.prototype.update = function() {
 		}
 
 		if (this.commandFinished) {
+			// TODO is executing three times a good idea?
+			this.executeNextCommand();
+			this.executeNextCommand();
 			this.executeNextCommand();
 		}
 	}
 	// Otherwise just do it the boring way
 	else {
-		while (this.commandQueue.length > 0) {
+		// while (this.commandQueue.length > 0) {
+		var n = this.commandQueue.length * this.scale;
+		for (var i = 0; i < n; i++) {
 			this.executeNextCommand();
 			this.x = this.x_new;
 			this.y = this.y_new;
@@ -197,7 +202,7 @@ Turtle.prototype.executeNextCommand = function() {
 				this.ang_new = args;
 				break;
 			case "hide":
-				log("Hide");
+				logText("Hide");
 				this.isVisible = false;
 				break;
 			case "show":
