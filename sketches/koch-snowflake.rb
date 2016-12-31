@@ -1,0 +1,62 @@
+def koch(length, n)
+    # Base case
+    if (n == 0) then
+        t.forward(length)
+    end
+    # Recursive case
+    else
+        length /= 3.0
+        koch(length, n-1)
+        t.left(60)
+        koch(length, n-1)
+        t.right(120)
+        koch(length, n-1)
+        t.left(60)
+        koch(length, n-1)
+    end
+end
+
+def kochSnowflake(length, n)
+    # Orient and center snowflake
+    t.setheading(0)
+    t.setxy(-length/2, length/2*Math::sqrt(3))
+    # Repeat 3 times
+    3.times do
+        koch(length, n)
+        t.right(120)
+    end
+end
+
+t.scale = 1
+t.reset()
+kochSnowflake(100, 3)
+
+=begin
+def koch(n, i=0)
+    if i == n then
+        t.forward(10/n)
+        t.left(60)
+        t.forward(10/n)
+        t.right(120)
+        t.forward(10/n)
+        t.left(60)
+        t.forward(10/n)
+    else
+        koch(n, i+1)
+        t.left(60)
+        koch(n, i+1)
+        t.right(120)
+        koch(n, i+1)
+        t.left(60)
+        koch(n, i+1)
+    end
+end
+
+t.reset()
+t.setxy(-100, 0)
+t.setheading(0)
+t.scale = 1
+t.hide()
+
+koch(3)
+=end

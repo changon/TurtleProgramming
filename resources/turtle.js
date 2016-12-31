@@ -101,9 +101,7 @@ Turtle.prototype.update = function() {
 		}
 
 		if (this.commandFinished) {
-			// TODO is executing three times a good idea?
-			this.executeNextCommand();
-			this.executeNextCommand();
+			// TODO
 			this.executeNextCommand();
 		}
 	}
@@ -280,12 +278,6 @@ function draw(p) {
 
 // Initialize instance mode
 // new p5(sketch);
-
-function repeat(n, f) {
-	for (var i = 0; i < n; i++) {
-		f();
-	}
-}
 
 /* Interative etch-a-sketch mode
  * Specify count with number keys (0-9)

@@ -11,3 +11,7 @@ Puzzles and challenges
 
 Fractals:
 L-systems
+
+# Editor
+Ctrl-Shift-Enter: insert value as comment
+Display syntax errors and exceptions

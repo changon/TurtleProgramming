@@ -27,7 +27,7 @@ function getURLVars() {
 // TODO this is ugly
 var urlVars = getURLVars();
 var program = urlVars["program"] || "sketch";
-readFileFromURL("./sketches/" + program + ".js");
+readFileFromURL("./sketches/" + program + ".rb");
 
 var iframe = document.querySelector("#output-iframe");
 init_sandbox(iframe);
@@ -48,18 +48,23 @@ document.body.addEventListener("keydown", function(event) {
 
 /* Helper functions */
 function render(iframe) {
-	console.log("Executing code");
-
 	// TODO: Get whole text or just selected text?
 	// var js_code = editor.getValue();
 	// Get selection, otherwise get current line
-	// TODO flash code to run
-	var js_code = editor.getSelectedText();
-	js_code = js_code ? js_code : editor.session.getLine(editor.getCursorPosition().row);
+	// TODO flash code on run
+	var code = editor.getSelectedText();
+	code = code ? code : editor.session.getLine(editor.getCursorPosition().row);
 
 	// Use iframe's contentWindow as namespace
 	var w = iframe.contentWindow;
-	w.eval(js_code);
+
+	var result = {};
+
+	// result.value = w.eval(code); // JavaScript
+	result.returnValue = w.Opal.eval(code); // Opal/Ruby
+	result.compiledCode = w.Opal.compile(code);
+
+	console.log("Executing code", result);
 }
 
 function init_sandbox(iframe) {
@@ -73,11 +78,24 @@ function init_sandbox(iframe) {
 			'<meta charset="utf-8"/>\n\t' +
 			'<title>Sandbox</title>\n' +
 			'<link rel="stylesheet" href="./resources/iframe-style.css"/>\n' +
+
+			'<!--p5.js-->\n' +
 			'<script language="javascript" src="./resources/p5.min.js"></script>\n' +
+
 			// '<script src="./resources/p5.gibber.min.js" type="text/javascript" charset="utf-8"></script>\n' +
 			// '<script> function setup() { window["setup1"](); } function draw() { window["draw1"](); } </script>\n' +
 			// '<script> var setup1 = function(){}; var draw1 = function(){}; </script>\n' +
-			'<script src="./resources/turtle.js"></script>\n' +
+
+			// TODO load opal asynchronously to not slow down page loading time
+			'<!--Opal-->\n' +
+			'<script type="text/javascript" src="./resources/opal.js"></script>\n' +
+			'<script type="text/javascript" src="./resources/opal-parser.js"></script>\n' +
+			'<script type="text/javascript" src="./resources/opal-native.js"></script>\n' +
+			'<script type="text/javascript">Opal.load("opal-parser")</script>\n' +
+			'<script type="text/ruby" src="resources/turtle-opal.rb"></script>\n' +
+
+			'<script type="text/javascript" src="./resources/turtle.js"></script>\n' +
+
 		'</head>\n' +
 		'<body>\n' +
 		'</body>\n' +
@@ -97,4 +115,8 @@ function init_sandbox(iframe) {
 			editor.clearSelection();
 		}, 500);
 	}
+
+	// Export iframe to main window
+	window.iframe = iframe;
+
 }
