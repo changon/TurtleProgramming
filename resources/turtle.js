@@ -37,6 +37,11 @@ Turtle.prototype.addCommand = function(cmd, args) {
 	this.commandQueue.unshift([cmd, args]);
 };
 
+Turtle.prototype.addCommand_ = function(cmd, args) {
+	// Add command to front of queue (end of array)
+	this.commandQueue.push([cmd, args]);
+};
+
 Turtle.prototype.addVertex = function() {
 	if (this.isPenDown) {
 		this.vertices.push({ type: "point", from: [this.x, this.y], to: [this.x_new, this.y_new] });
@@ -60,6 +65,8 @@ Turtle.prototype.write = function(str) { this.addCommand("write", str); }
 // Drawing state
 Turtle.prototype.show = function() { this.addCommand("show"); }
 Turtle.prototype.hide = function() { this.addCommand("hide"); }
+Turtle.prototype.show_ = function() { this.addCommand_("show"); }
+Turtle.prototype.hide_ = function() { this.addCommand_("hide"); }
 Turtle.prototype.clear = function() { this.addCommand("clear"); }
 Turtle.prototype.pendown = function() { this.addCommand("pendown"); }
 Turtle.prototype.penup = function() { this.addCommand("penup"); }
@@ -287,6 +294,7 @@ function draw(p) {
  * r: reset()
  * ,: pendown()
  * .: penup()
+ * \: show()/hide()
  */
 var countPrefix = 0;
 var macro = [];
@@ -320,6 +328,7 @@ function parseKey(key) {
 		case 'r': t.reset(); break;
 		case ',': case '¼': t.pendown(); break; // Comma
 		case '.': case '¾': t.penup(); break; // Period
+		case '\\': t.isVisible ? t.hide_() : t.show(); break;
 
 		// Macro
 		case 'q':

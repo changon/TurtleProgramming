@@ -1,6 +1,5 @@
 # Turtle graphics
-penup/pendown
-logo aliases (fd, rt, lt, etc.)
+circle
 
 # Future
 input/output
