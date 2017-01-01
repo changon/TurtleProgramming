@@ -4,6 +4,25 @@
 // https://stackoverflow.com/questions/27531860/how-to-highlight-a-certain-line-in-ace-editor
 
 /* Helpers */
+// Get contents stored in localStorage
+// TODO use jquery?
+function readFromLocalStorage() {
+	var data = localStorage.getItem("editor_contents");
+	if (data) {
+		editor.setValue(data, -1); // Replace everything
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+function saveToLocalStorage() {
+	console.log("Saving...")
+	var data = editor.getValue();
+	localStorage.setItem("editor_contents", data);
+}
+
 // Get contents of sketch.js without running
 function readFileFromURL(url) {
 	$.get(url, function(data) {
@@ -26,8 +45,16 @@ function getURLVars() {
 
 // TODO this is ugly
 var urlVars = getURLVars();
-var program = urlVars["program"] || "sketch";
-readFileFromURL("./sketches/" + program + ".rb");
+var program = urlVars["program"]; // || "sketch";
+
+// If a program is specified, load it
+// Else, read from localStorage
+if (program) {
+	readFileFromURL("./sketches/" + program + ".rb");
+}
+else {
+	readFromLocalStorage();
+}
 
 var iframe = document.querySelector("#output-iframe");
 init_sandbox(iframe);
@@ -120,3 +147,15 @@ function init_sandbox(iframe) {
 	window.iframe = iframe;
 
 }
+
+// Save timer
+window.setInterval(saveToLocalStorage, 30000);
+
+// Save keybinding
+editor.commands.addCommand({
+    name: "save",
+    exec: function() {
+		saveToLocalStorage();
+	},
+    bindKey: {mac: "Cmd-S", win: "Ctrl-S"}
+})
