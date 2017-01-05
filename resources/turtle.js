@@ -65,13 +65,19 @@ Turtle.prototype.write = function(str) { this.addCommand("write", str); }
 // Drawing state
 Turtle.prototype.show = function() { this.addCommand("show"); }
 Turtle.prototype.hide = function() { this.addCommand("hide"); }
-Turtle.prototype.show_ = function() { this.addCommand_("show"); }
-Turtle.prototype.hide_ = function() { this.addCommand_("hide"); }
 Turtle.prototype.clear = function() { this.addCommand("clear"); }
 Turtle.prototype.pendown = function() { this.addCommand("pendown"); }
 Turtle.prototype.penup = function() { this.addCommand("penup"); }
 
 Turtle.prototype.reset = function() { this.clear(); this.setxy(0, 0); this.setheading(90); }
+
+// Urgent commands
+Turtle.prototype["show!"] = function() { this.addCommand_("show"); }
+Turtle.prototype["hide!"] = function() { this.addCommand_("hide"); }
+Turtle.prototype["clear!"] = function() { this.addCommand_("clear"); }
+Turtle.prototype["pendown!"] = function() { this.addCommand_("pendown"); }
+Turtle.prototype["penup!"] = function() { this.addCommand_("penup"); }
+Turtle.prototype["reset!"] = function() { this.addCommand_("reset"); }
 
 // Aliases
 Turtle.prototype.fd = Turtle.prototype.forward;
@@ -80,6 +86,10 @@ Turtle.prototype.rt = Turtle.prototype.right;
 Turtle.prototype.lt = Turtle.prototype.left;
 Turtle.prototype.goto = Turtle.prototype.setxy;
 Turtle.prototype.seth = Turtle.prototype.setheading;
+
+// isX -> x?
+Object.defineProperty(Turtle.prototype, "pendown?", { get: function() { return this.isPenDown; }, })
+Object.defineProperty(Turtle.prototype, "visible?", { get: function() { return this.isVisible; }, })
 
 // TODO: stop, color
 // TODO: push, pop context
@@ -231,6 +241,19 @@ Turtle.prototype.executeNextCommand = function() {
 				logText("Pen up");
 				this.isPenDown = false;
 				break;
+			case "reset":
+				logText("Reset");
+
+				// clear(); setxy(0, 0); setheading(90);
+				this.vertices = []; this.addVertex();
+				this.ang_new = 90;
+				this.x_new = this.y_new = 0;
+
+				// Reset command queue
+				while (this.commandQueue.length > 0) {
+					this.commandQueue.pop();
+				}
+				break;
 		}
 	}
 }
@@ -324,11 +347,11 @@ function parseKey(key) {
 		case 'd': case 'l': t.right(countPrefix ? countPrefix : 20); countPrefix = 0; break;
 		case 'a': case 'h': t.left(countPrefix ? countPrefix : 20); countPrefix = 0; break;
 
-		case 'c': t.clear(); break;
-		case 'r': t.reset(); break;
-		case ',': case '¼': t.pendown(); break; // Comma
-		case '.': case '¾': t.penup(); break; // Period
-		case '\\': t.isVisible ? t.hide_() : t.show(); break;
+		case 'c': t["clear!"](); break;
+		case 'r': t["reset!"](); break;
+		case ',': case '¼': t["pendown!"](); break; // Comma
+		case '.': case '¾': t["penup!"](); break; // Period
+		case '\\': t.isVisible ? t["hide!"]() : t["show!"](); break;
 
 		// Macro
 		case 'q':
