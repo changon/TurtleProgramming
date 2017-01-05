@@ -7,5 +7,7 @@ http://berniepope.id.au/html/js-turtle/turtle.html (sketch.js inspired by this)
 https://ycatch.github.io/p5.turtle.js/
 Python turtle: https://docs.python.org/2/library/turtle.html
 https://michael0x2a.com/blog/turtle-examples
+https://github.com/peterc/trtl/tree/master/examples
+http://leahbuechley.com/Turtle/index.html
 
 TurtleScript?  https://github.com/cscott/TurtleScript

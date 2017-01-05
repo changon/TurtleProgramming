@@ -18,6 +18,10 @@ var Turtle = function() {
 	this.ang = 90;
 	this.ang_new = this.ang;
 
+	// Attributes
+	this.color_ = "black";
+	this.width_ = 1;
+
 	// Appearance
 	this.isVisible = true;
 	this.isPenDown = true;
@@ -26,6 +30,7 @@ var Turtle = function() {
 	this.scale = 0.5; // scale for lerp, between 0.0 and 1.0
 
 	// Backend
+	this.stateStack = []; // stack of states
 	this.commandQueue = []; // queue of commands
 	this.commandFinished = true;
 	this.vertices = []; // list of vertices
@@ -44,12 +49,42 @@ Turtle.prototype.addCommand_ = function(cmd, args) {
 
 Turtle.prototype.addVertex = function() {
 	if (this.isPenDown) {
-		this.vertices.push({ type: "point", from: [this.x, this.y], to: [this.x_new, this.y_new] });
+		this.vertices.push({
+			type: "point",
+			from: [this.x, this.y],
+			to: [this.x_new, this.y_new],
+			color: this.color_,
+			width: this.width_
+		});
 	}
 };
 
 Turtle.prototype.addText = function(str) {
 	this.vertices.push({ type: "text", str: str, at: [this.x, this.y] });
+};
+
+// https://www.mathworks.com/help/symbolic/mupad_ref/plot-turtle.html
+// Save the current state
+Turtle.prototype.pushState = function() {
+	this.stateStack.push({
+		position: [this.x, this.y],
+		angle: this.ang,
+		color: this.color_,
+		width: this.width_
+	});
+};
+
+// Restore the last remembered state and remove it from the list of remembered states
+Turtle.prototype.popState = function() {
+	var lastState = this.stateStack.pop();
+	if (lastState) {
+		this.x_new = lastState.position[0];
+		this.y_new = lastState.position[1];
+		this.ang_new = lastState.angle;
+		this.color_ = lastState.color;
+		this.width_ = lastState.width;
+		console.log(this);
+	}
 };
 
 /* Turtle commands */
@@ -62,12 +97,17 @@ Turtle.prototype.setxy = function(x, y) { this.addCommand("setxy", [x, y]); }
 Turtle.prototype.setheading = function(ang) { this.addCommand("setheading", ang); }
 Turtle.prototype.write = function(str) { this.addCommand("write", str); }
 
+Turtle.prototype.push = function () { this.addCommand("push"); };
+Turtle.prototype.pop = function () { this.addCommand("pop"); };
+
 // Drawing state
 Turtle.prototype.show = function() { this.addCommand("show"); }
 Turtle.prototype.hide = function() { this.addCommand("hide"); }
 Turtle.prototype.clear = function() { this.addCommand("clear"); }
 Turtle.prototype.pendown = function() { this.addCommand("pendown"); }
 Turtle.prototype.penup = function() { this.addCommand("penup"); }
+Turtle.prototype.color = function(...args) { this.addCommand("color", args); }
+Turtle.prototype.width = function(n) { this.addCommand("width", n); }
 
 Turtle.prototype.reset = function() { this.clear(); this.setxy(0, 0); this.setheading(90); }
 
@@ -78,6 +118,8 @@ Turtle.prototype["clear!"] = function() { this.addCommand_("clear"); }
 Turtle.prototype["pendown!"] = function() { this.addCommand_("pendown"); }
 Turtle.prototype["penup!"] = function() { this.addCommand_("penup"); }
 Turtle.prototype["reset!"] = function() { this.addCommand_("reset"); }
+Turtle.prototype["setxy!"] = function(x, y) { this.addCommand_("setxy", [x, y]); }
+Turtle.prototype["setheading!"] = function(x, y) { this.addCommand_("setheading", [x, y]); }
 
 // Aliases
 Turtle.prototype.fd = Turtle.prototype.forward;
@@ -87,12 +129,14 @@ Turtle.prototype.lt = Turtle.prototype.left;
 Turtle.prototype.goto = Turtle.prototype.setxy;
 Turtle.prototype.seth = Turtle.prototype.setheading;
 
+Turtle.prototype["goto!"] = Turtle.prototype["setxy!"];
+Turtle.prototype["seth!"] = Turtle.prototype["setheading!"];
+
 // isX -> x?
 Object.defineProperty(Turtle.prototype, "pendown?", { get: function() { return this.isPenDown; }, })
 Object.defineProperty(Turtle.prototype, "visible?", { get: function() { return this.isVisible; }, })
 
 // TODO: stop, color
-// TODO: push, pop context
 // TODO: commandHistory, undo
 
 Turtle.prototype.update = function() {
@@ -124,9 +168,8 @@ Turtle.prototype.update = function() {
 	}
 	// Otherwise just do it the boring way
 	else {
-		// while (this.commandQueue.length > 0) {
-		var n = this.commandQueue.length * this.scale;
-		for (var i = 0; i < n; i++) {
+		// var n = this.commandQueue.length * this.scale; // for (var i = 0; i < n; i++)
+		while (this.commandQueue.length > 0) {
 			this.executeNextCommand();
 			this.x = this.x_new;
 			this.y = this.y_new;
@@ -136,11 +179,8 @@ Turtle.prototype.update = function() {
 };
 
 Turtle.prototype.draw = function() {
-	// Clear canvas
-	background(bgcolor);
-
 	// Make relative to origin
-	push();
+	push(); // {
 	translate(width/2, height/2);
 
 	// TODO perspective?
@@ -148,8 +188,12 @@ Turtle.prototype.draw = function() {
 	// Draw vertices
 	// TODO: rename this.vertices
 	for (var i = 1; i < this.vertices.length; i++) {
+		push(); // {
 		var vertex = this.vertices[i];
 		if (vertex.type == "point") {
+			stroke(vertex.color);
+			strokeWeight(vertex.width);
+
 			var x1 = vertex.from[0];
 			var y1 = vertex.from[1];
 			var x2 = vertex.to[0];
@@ -157,26 +201,28 @@ Turtle.prototype.draw = function() {
 			line(x1, -y1, x2, -y2);
 		}
 		else if (vertex.type == "text") {
-			push();
-			fill(255);
+			stroke(vertex.color || 0);
 			text(vertex.str, vertex.at[0], -vertex.at[1]);
-			pop();
 		}
+		pop(); // }
 	}
 
 	// Now make relative to turtle
-	push();
+	push(); // {
 	translate(this.x, -this.y);
 	rotate(-radians(this.ang));
 
 	// Draw turtle
 	if (this.isVisible) {
+		stroke(0, 0, 0, 127);
+		noFill();
 		// triangle(5, 0, -5, 4, -5, -4);
 		quad(5, 0, -5, 4, -3, 0, -5, -4);
 	}
 
-	pop();
-	pop();
+	pop(); // }
+
+	pop(); // }
 };
 
 Turtle.prototype.executeNextCommand = function() {
@@ -233,6 +279,14 @@ Turtle.prototype.executeNextCommand = function() {
 				logText('Write "' + args + '"');
 				this.addText(args);
 				break;
+			case "push":
+				logText("Saving state");
+				this.pushState();
+				break;
+			case "pop":
+				logText("Restoring state");
+				this.popState();
+				break;
 			case "pendown":
 				logText("Pen down");
 				this.isPenDown = true;
@@ -240,6 +294,14 @@ Turtle.prototype.executeNextCommand = function() {
 			case "penup":
 				logText("Pen up");
 				this.isPenDown = false;
+				break;
+			case "color":
+				logText("Set color to " + args);
+				this.color_ = color(...args); // wrap using p5.Color
+				break;
+			case "width":
+				logText("Set width to " + args);
+				this.width_ = args;
 				break;
 			case "reset":
 				logText("Reset");
@@ -280,8 +342,6 @@ var message = "";
 function setup(p) {
 	canvas = createCanvas(windowWidth, windowHeight);
 	background(bgcolor);
-	noFill();
-	stroke(10,0,0,127);
 
 	t.update();
 	t.draw();
@@ -291,16 +351,19 @@ function setup(p) {
 function draw(p) {
 	// Redraw only if dirty
 	if (!t.commandFinished) {
+		// Clear canvas
+		background(bgcolor);
+
 		t.draw();
 		t.debug();
 
 		// TODO change coords. change to div?
-		push();
+		push(); // {
 		fill(0);
 		var m = message;
 		if (isMacroRecording) { m = "Macro recording -- " + m; }
 		text(m, 50, height - 50);
-		pop();
+		pop(); // }
 	}
 
 	t.update();
