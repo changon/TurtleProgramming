@@ -27,14 +27,13 @@ var Turtle = function() {
 	this.isPenDown = true;
 
 	// Animation
-	this.scale = 0.5; // scale for lerp, between 0.0 and 1.0
+	this.scale = 10; // tweening speed
 
 	// Backend
 	this.stateStack = []; // stack of states
 	this.commandQueue = []; // queue of commands
 	this.commandFinished = true;
 	this.vertices = []; // list of vertices
-	this.addVertex();
 };
 
 Turtle.prototype.addCommand = function(cmd, args) {
@@ -61,6 +60,13 @@ Turtle.prototype.addVertex = function() {
 
 Turtle.prototype.addText = function(str) {
 	this.vertices.push({ type: "text", str: str, at: [this.x, this.y] });
+};
+
+// Add a placeholder to signify that there is a break between the previous vertex and the next vertex
+// (i.e., when using penup and setxy)
+// This is so a line segment does not erroneously follow the turtle
+Turtle.prototype.addVoid = function() {
+	this.vertices.push({ type: "void" });
 };
 
 // https://www.mathworks.com/help/symbolic/mupad_ref/plot-turtle.html
@@ -109,7 +115,7 @@ Turtle.prototype.penup = function() { this.addCommand("penup"); }
 Turtle.prototype.color = function(...args) { this.addCommand("color", args); }
 Turtle.prototype.width = function(n) { this.addCommand("width", n); }
 
-Turtle.prototype.reset = function() { this.clear(); this.setxy(0, 0); this.setheading(90); }
+Turtle.prototype.reset = function() { this.addCommand("reset"); }
 
 // Urgent commands
 Turtle.prototype["show!"] = function() { this.addCommand_("show"); }
@@ -120,6 +126,8 @@ Turtle.prototype["penup!"] = function() { this.addCommand_("penup"); }
 Turtle.prototype["reset!"] = function() { this.addCommand_("reset"); }
 Turtle.prototype["setxy!"] = function(x, y) { this.addCommand_("setxy", [x, y]); }
 Turtle.prototype["setheading!"] = function(x, y) { this.addCommand_("setheading", [x, y]); }
+
+Turtle.prototype["stop!"] = function() { this.addCommand_("stop"); }
 
 // Aliases
 Turtle.prototype.fd = Turtle.prototype.forward;
@@ -142,33 +150,35 @@ Object.defineProperty(Turtle.prototype, "visible?", { get: function() { return t
 Turtle.prototype.update = function() {
 	// If turtle is visible, do all the fancy animation stuff
 	if (this.isVisible) {
-		// Check how close the values are to the new values
-		var eps = 2; // epsilon value
-		var x_eq = Math.abs(this.x - this.x_new) < eps;
-		var y_eq = Math.abs(this.y - this.y_new) < eps;
-		var ang_eq = Math.abs(this.ang - this.ang_new) < eps;
+		// Check if turtle has reached its new position (or close enough to it)
+		var x_eq = this.x_new == this.x;
+		var y_eq = this.y_new == this.y;
+		var ang_eq = Math.abs(this.ang_new - this.ang) < 20;
 
+		// If it has, then execute the next command
 		if (x_eq && y_eq && ang_eq) {
-			this.commandFinished = true;
-			// Set them equal to the new values since they're close enough anyway
-			this.x = this.x_new;
-			this.y = this.y_new;
 			this.ang = this.ang_new;
-		} else {
-			// Interpolate
-			if (!x_eq) 		this.x = lerp(this.x, this.x_new, this.scale);
-			if (!y_eq) 		this.y = lerp(this.y, this.y_new, this.scale);
-			if (!ang_eq)	this.ang = lerp(this.ang, this.ang_new, this.scale);
-		}
 
-		if (this.commandFinished) {
-			// TODO
+			this.commandFinished = true;
 			this.executeNextCommand();
 		}
+		// Otherwise move towards new position
+		else {
+			var diff = new p5Vector(this.x_new - this.x, this.y_new - this.y);
+			var dist = diff.mag();
+			var dir = diff.normalize(); // destructive
+
+			// Set them equal to the new values if closer than scale
+			if (dist < this.scale) this.x = this.x_new; else this.x += this.scale * dir.x;
+			if (dist < this.scale) this.y = this.y_new; else this.y += this.scale * dir.y;
+
+			this.ang = lerp(this.ang, this.ang_new, 0.5);
+		}
+
 	}
 	// Otherwise just do it the boring way
 	else {
-		// var n = this.commandQueue.length * this.scale; // for (var i = 0; i < n; i++)
+		// var n = this.commandQueue.length * this.scale; // while (n--)
 		while (this.commandQueue.length > 0) {
 			this.executeNextCommand();
 			this.x = this.x_new;
@@ -187,23 +197,31 @@ Turtle.prototype.draw = function() {
 
 	// Draw vertices
 	// TODO: rename this.vertices
-	for (var i = 1; i < this.vertices.length; i++) {
+	for (var i = 0; i < this.vertices.length; i++) {
 		push(); // {
 		var vertex = this.vertices[i];
 		if (vertex.type == "point") {
 			stroke(vertex.color);
 			strokeWeight(vertex.width);
 
-			var x1 = vertex.from[0];
-			var y1 = vertex.from[1];
-			var x2 = vertex.to[0];
-			var y2 = vertex.to[1];
+			var [x1, y1] = vertex.from;
+			var x2, y2;
+
+			// Draw only up to the turtle, don't draw ahead
+			if (i == this.vertices.length-1 && !this.commandFinished) {
+				[x2, y2] = [this.x, this.y];
+			} else {
+				[x2, y2] = vertex.to;
+			}
+
 			line(x1, -y1, x2, -y2);
 		}
 		else if (vertex.type == "text") {
 			stroke(vertex.color || 0);
 			text(vertex.str, vertex.at[0], -vertex.at[1]);
 		}
+		// ignore "void
+
 		pop(); // }
 	}
 
@@ -257,6 +275,7 @@ Turtle.prototype.executeNextCommand = function() {
 				logText("Set [x, y] to " + args);
 				this.x_new = args[0];
 				this.y_new = args[1];
+				this.addVoid();
 				break;
 			case "setheading":
 				logText("Set heading to " + args);
@@ -272,8 +291,7 @@ Turtle.prototype.executeNextCommand = function() {
 				break;
 			case "clear":
 				logText("Clear");
-				this.vertices = [];
-				this.addVertex();
+				this.vertices.length = 0;
 				break;
 			case "write":
 				logText('Write "' + args + '"');
@@ -294,6 +312,7 @@ Turtle.prototype.executeNextCommand = function() {
 			case "penup":
 				logText("Pen up");
 				this.isPenDown = false;
+				this.addVoid();
 				break;
 			case "color":
 				logText("Set color to " + args);
@@ -307,14 +326,16 @@ Turtle.prototype.executeNextCommand = function() {
 				logText("Reset");
 
 				// clear(); setxy(0, 0); setheading(90);
-				this.vertices = []; this.addVertex();
-				this.ang_new = 90;
+				this.vertices.length = 0;
+				this.ang = this.ang_new = 90;
+				this.x = this.y = 0;
 				this.x_new = this.y_new = 0;
+				break;
+			case "stop":
+				logText("Stop");
 
 				// Reset command queue
-				while (this.commandQueue.length > 0) {
-					this.commandQueue.pop();
-				}
+				this.commandQueue.length = 0;
 				break;
 		}
 	}
@@ -411,7 +432,7 @@ function parseKey(key) {
 		case 'a': case 'h': t.left(countPrefix ? countPrefix : 20); countPrefix = 0; break;
 
 		case 'c': t["clear!"](); break;
-		case 'r': t["reset!"](); break;
+		case 'r': t["stop!"](); t["reset!"](); break;
 		case ',': case '¼': t["pendown!"](); break; // Comma
 		case '.': case '¾': t["penup!"](); break; // Period
 		case '\\': t.isVisible ? t["hide!"]() : t["show!"](); break;
