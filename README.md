@@ -1,12 +1,26 @@
 # Turtle programming sandbox
 
-# To Program
+## Setup
+
+Install dependencies:
+
+```
+npm install
+```
+
+Run server:
+
+```
+gulp dev
+```
+
+## To Program
 - bulid reference side bar
 - build module side bar
 - bootstrap for prettify layout
 - React(?) future future
 
-# To Address
+## To Address
 -Multiple languages. python (count lines for limits on goals)
 -Goals:
   Conditionals

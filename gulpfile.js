@@ -10,7 +10,9 @@ var paths = {
 gulp.task('pug', function() {
 	util.log('Compiling index.pug...');
 	return gulp.src(paths.pug)
-		.pipe(pug())
+		.pipe(pug({
+			pretty: true
+		}))
 		.pipe(gulp.dest('.'));
 });
 
@@ -21,7 +23,7 @@ gulp.task('watch', [ 'pug' ], function() {
 gulp.task('dev', [ 'watch' ], function() {
 	gulp.src('.')
 		.pipe(webserver({
-			port: 3000,
+			port: 8080,
 			livereload: true,
 			open: true
 		}));
