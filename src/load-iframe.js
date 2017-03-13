@@ -9,7 +9,7 @@
 function readFromLocalStorage() {
 	var data = localStorage.getItem("editor_contents");
 	if (data) {
-		editor.setValue(data, -1); // Replace everything
+		_editor.setValue(data, -1); // Replace everything
 		return true;
 	}
 	else {
@@ -19,14 +19,14 @@ function readFromLocalStorage() {
 
 function saveToLocalStorage() {
 	console.log("Saving...")
-	var data = editor.getValue();
+	var data = _editor.getValue();
 	localStorage.setItem("editor_contents", data);
 }
 
 // Get contents of sketch.js without running
 function readFileFromURL(url) {
 	$.get(url, function(data) {
-		editor.setValue(data, -1); // Replace everything
+		_editor.setValue(data, -1); // Replace everything
 	}, "text");
 }
 
@@ -76,20 +76,44 @@ document.body.addEventListener("keydown", function(event) {
 /* Helper functions */
 function render(iframe) {
 	// TODO: Get whole text or just selected text?
-	// var js_code = editor.getValue();
+	// var js_code = _editor.getValue();
 	// Get selection, otherwise get current line
 	// TODO flash code on run
-	var code = editor.getSelectedText();
-	code = code ? code : editor.session.getLine(editor.getCursorPosition().row);
+	// var code = _editor.getSelectedText();
+	var code = _editor.getValue();
+	code = code ? code : _editor.session.getLine(_editor.getCursorPosition().row);
 
 	// Use iframe's contentWindow as namespace
 	var w = iframe.contentWindow;
 
 	var result = {};
 
-	// result.value = w.eval(code); // JavaScript
-	result.returnValue = w.Opal.eval(code); // Opal/Ruby
-	result.compiledCode = w.Opal.compile(code);
+	switch (_languageSelect.value) {
+	case "javascript":
+		result.compiledCode = code;
+		result.returnValue = w.eval(result.compiledCode); // TODO move to end
+		break;
+	case "ruby":
+		result.compiledCode = w.Opal.compile(code);
+		result.returnValue = w.eval(result.compiledCode); // TODO move to end
+		break;
+	case "python":
+		w.Sk.pre = "output";
+		w.Sk.configure({output: function(text) { console.log(text); }, read: function() {
+			if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+				throw "File not found: '" + x + "'";
+			return Sk.builtinFiles["files"][x];
+		}});
+		// (w.Sk.TurtleGraphics || (w.Sk.TurtleGraphics = {})).target = 'mycanvas';
+		var myPromise = w.Sk.misceval.asyncToPromise(function() {
+			return w.Sk.importMainWithBody("<stdin>", false, code, true);
+		});
+		myPromise.then(function(mod) {
+			console.log('success');
+		}, function(err) {
+			console.log(err.toString());
+		});
+	}
 
 	console.log("Executing code", result);
 }
@@ -119,9 +143,14 @@ function init_sandbox(iframe) {
 			'<script type="text/javascript" src="./resources/opal-parser.js"></script>\n' +
 			'<script type="text/javascript" src="./resources/opal-native.js"></script>\n' +
 			'<script type="text/javascript">Opal.load("opal-parser")</script>\n' +
-			'<script type="text/ruby" src="resources/turtle-opal.rb"></script>\n' +
+			'<script type="text/ruby" src="./src/turtle-opal.rb"></script>\n' +
 
-			'<script type="text/javascript" src="./resources/turtle.js"></script>\n' +
+			'<!--Skulpt-->\n' +
+			'<script type="text/javascript" src="http://www.skulpt.org/static/skulpt.min.js"></script>\n' +
+			'<script type="text/javascript" src="http://www.skulpt.org/static/skulpt-stdlib.js"></script>\n' +
+			'<script type="text/javascript" src="./src/turtle-skulpt.py"></script>\n' +
+
+			'<script type="text/javascript" src="./src/turtle.js"></script>\n' +
 
 		'</head>\n' +
 		'<body>\n' +
@@ -137,9 +166,9 @@ function init_sandbox(iframe) {
 	// TODO replace with an event listener
 	if (urlVars["autorun"]) {
 		iframe.contentWindow.setTimeout(function() {
-			editor.selectAll();
+			_editor.selectAll();
 			render(iframe);
-			editor.clearSelection();
+			_editor.clearSelection();
 		}, 500);
 	}
 
@@ -152,7 +181,7 @@ function init_sandbox(iframe) {
 window.setInterval(saveToLocalStorage, 30000);
 
 // Save keybinding
-editor.commands.addCommand({
+_editor.commands.addCommand({
     name: "save",
     exec: function() {
 		saveToLocalStorage();

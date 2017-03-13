@@ -11,3 +11,9 @@ https://github.com/peterc/trtl/tree/master/examples
 http://leahbuechley.com/Turtle/index.html
 
 TurtleScript?  https://github.com/cscott/TurtleScript
+
+Cycloids?
+http://www.di.unito.it/~barbara/MicRobot/AttiEuroLogo2007/proceedings/W-Foltynowicz.pdf
+
+Ramda two-pane editor:
+http://ramdajs.com/repl

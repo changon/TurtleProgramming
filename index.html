@@ -12,11 +12,25 @@
 	<!--JQuery-->
 	<script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
 
+	<!--Bootstrap-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
 </head>
 
 <body>
 	<!--Main wrap-->
 	<div id="main-wrap">
+
+		<!--Toolbar-->
+		<div id="toolbar">
+			<select id="language-select" name="select">
+				<option value="javascript" selected>JavaScript</option>
+				<option value="ruby">Ruby</option>
+				<option value="python">Python</option>
+			</select>
+		</div>
+
 		<!--Code-->
 		<div id="code">
 			<div id="editor"><!--Code goes here--></div>
@@ -33,29 +47,8 @@
 	</div>
 	<!--End main wrap-->
 
-	<script>
-/* Load Ace editor */
-var editor = ace.edit("editor");
-// Options: https://github.com/ajaxorg/ace/wiki/Embedding-API
-editor.setOptions({
-	// editor.renderer
-	theme: "ace/theme/monokai",
-});
-
-editor.getSession().setOptions({
-	mode: "ace/mode/ruby",
-});
-
-/* Window event listeners */
-// Resize listener
-window.addEventListener("resize", function() {
-	editor.resize();
-	// TODO: resize p5 canvas as well
-});
-
-	</script>
-
-	<script src="main.js"></script>
+	<script src="src/main.js"></script>
+	<script src="src/load-iframe.js"></script>
 
 </body>
 </html>
