@@ -1,0 +1,22 @@
+{
+  "name": "turtle-programming",
+  "version": "1.0.0",
+  "description": "Turtle Programming",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/changon/TurtleProgramming.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/changon/TurtleProgramming/issues"
+  },
+  "homepage": "https://github.com/changon/TurtleProgramming#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-pug": "^3.3.0",
+    "gulp-server-livereload": "^1.9.2"
+  },
+  "dependencies": {
+    "pug": "^2.0.0-beta11"
+  }
+}
