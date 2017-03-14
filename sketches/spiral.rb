@@ -21,7 +21,7 @@ def rotation()
         hex(n)
         n += 1
         t.left(3)
-    })
+	end
 end
 
 t.reset()

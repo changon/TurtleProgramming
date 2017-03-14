@@ -46,17 +46,18 @@
             </ul></span>
           <!-- Run code-->
           <!-- TODO fix onclick for everything!-->
-          <button class="btn btn-primary" onclick="evalAll()" aria-label="Run code"><span class="glyphicon glyphicon-play"></span>&nbsp; Run code</button>
           <!-- Save-->
-          <button class="btn btn-default" onclick="saveToLocalStorage()" aria-label="Save"><span class="glyphicon glyphicon-save"></span>&nbsp; Save</button></span>
+          <button class="btn btn-default" onclick="saveToLocalStorage()" aria-label="Save"><span class="glyphicon glyphicon-save"></span>&nbsp; Save</button>
+          <button class="btn btn-primary" onclick="evalAll()" aria-label="Run code"><span class="glyphicon glyphicon-play"></span>&nbsp; Run code</button>
+          <button class="btn btn-danger" onclick="iframe.contentWindow.t[&quot;stop!&quot;]()" title=""><span class="glyphicon glyphicon-stop"></span>&nbsp; Stop executing</button></span>
         <!-- Output buttons--><span class="pull-right" id="output-toolbar">
           <!-- Ugh. Don't access t directly! Bind to a model or something!-->
-          <button class="btn btn-default" onclick="iframe.contentWindow.t.reset()" title="Shortcut: r">Reset</button>
-          <button class="btn btn-default" onclick="iframe.contentWindow.t.clear()" title="Shortcut: c">Clear</button>
-          <button class="btn btn-default" onclick="iframe.contentWindow.t.pendown()" title="Shortcut: ,">Pen down</button>
-          <button class="btn btn-default" onclick="iframe.contentWindow.t.penup()" title="Shortcut: .">Pen up</button>
-          <button class="btn btn-default" onclick="iframe.contentWindow.t.show()" title="Shortcut: \">Show</button>
-          <button class="btn btn-default" onclick="iframe.contentWindow.t.hide()" title="Shortcut: \">Hide</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t[&quot;reset!&quot;]()" title="Shortcut: r">Reset</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t[&quot;clear!&quot;]()" title="Shortcut: c">Clear</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t[&quot;pendown!&quot;]()" title="Shortcut: ,">Pen down</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t[&quot;penup!&quot;]()" title="Shortcut: .">Pen up</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t[&quot;show!&quot;]()" title="Shortcut: \">Show</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t[&quot;hide!&quot;]()" title="Shortcut: \">Hide</button>
           <!-- TODO: bind to state: pen up/down and show/hide--></span>
       </div>
       <!-- } End toolbar-->

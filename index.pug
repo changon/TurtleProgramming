@@ -66,28 +66,31 @@ html
 
 					// Run code
 					// TODO fix onclick for everything!
-					button.btn.btn-primary(onclick='evalAll()', aria-label='Run code')
-						span.glyphicon.glyphicon-play
-						| &nbsp; Run code
 					// Save
 					button.btn.btn-default(onclick='saveToLocalStorage()', aria-label='Save')
 						span.glyphicon.glyphicon-save
 						| &nbsp; Save
+					button.btn.btn-primary(onclick='evalAll()', aria-label='Run code')
+						span.glyphicon.glyphicon-play
+						| &nbsp; Run code
+					button.btn.btn-danger(onclick='iframe.contentWindow.t["stop!"]()', title='')
+						span.glyphicon.glyphicon-stop
+						| &nbsp; Stop executing
 
 				// Output buttons
 				span#output-toolbar.pull-right
 					// Ugh. Don't access t directly! Bind to a model or something!
-					button.btn.btn-default(onclick='iframe.contentWindow.t.reset()', title='Shortcut: r')
+					button.btn.btn-default(onclick='iframe.contentWindow.t["reset!"]()', title='Shortcut: r')
 						| Reset
-					button.btn.btn-default(onclick='iframe.contentWindow.t.clear()', title='Shortcut: c')
+					button.btn.btn-default(onclick='iframe.contentWindow.t["clear!"]()', title='Shortcut: c')
 						| Clear
-					button.btn.btn-default(onclick='iframe.contentWindow.t.pendown()', title='Shortcut: ,')
+					button.btn.btn-default(onclick='iframe.contentWindow.t["pendown!"]()', title='Shortcut: ,')
 						| Pen down
-					button.btn.btn-default(onclick='iframe.contentWindow.t.penup()', title='Shortcut: .')
+					button.btn.btn-default(onclick='iframe.contentWindow.t["penup!"]()', title='Shortcut: .')
 						| Pen up
-					button.btn.btn-default(onclick='iframe.contentWindow.t.show()', title='Shortcut: \\')
+					button.btn.btn-default(onclick='iframe.contentWindow.t["show!"]()', title='Shortcut: \\')
 						| Show
-					button.btn.btn-default(onclick='iframe.contentWindow.t.hide()', title='Shortcut: \\')
+					button.btn.btn-default(onclick='iframe.contentWindow.t["hide!"]()', title='Shortcut: \\')
 						| Hide
 					// TODO: bind to state: pen up/down and show/hide
 				
