@@ -19,7 +19,7 @@ var Turtle = function() {
 	this.ang_new = this.ang;
 
 	// Attributes
-	this.color_ = "black";
+	this.color_ = 255; // white
 	this.width_ = 1;
 
 	// Appearance
@@ -232,10 +232,13 @@ Turtle.prototype.draw = function() {
 
 	// Draw turtle
 	if (this.isVisible) {
-		stroke(0, 0, 0, 127);
-		noFill();
+		// stroke(0, 0, 0, 127);
+		stroke(this.color_, this.color_, this.color_, 127);
+		// noFill();
+		fill();
 		// triangle(5, 0, -5, 4, -5, -4);
 		quad(5, 0, -5, 4, -3, 0, -5, -4);
+		noFill();
 	}
 
 	pop(); // }
@@ -355,7 +358,7 @@ Turtle.prototype.debug = function() {
 
 var t = new Turtle();
 var canvas;
-var bgcolor = 200; // 64
+var bgcolor = 0; // 200, 64
 var message = "";
 
 // var sketch = {};

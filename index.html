@@ -24,13 +24,28 @@
     <!-- Main wrap {-->
     <div id="main-wrap">
       <!-- Toolbar {-->
-      <div id="toolbar">
-        <!-- Language select {-->
-        <label for="language-select">Language</label>
-        <select class="selectpicker show-tick show-menu-arrow" id="language-select" name="select" aria-label="Select language" @change="updateLanguage" v-model="currentLanguage">
-          <option v-for="lang in supportedLanguages" :value="lang.value">{{ lang.name }}</option>
-        </select>
-        <!-- }-->
+      <div id="toolbar" role="toolbar">
+        <!-- Editor buttons--><span id="editor-toolbar">
+          <!-- Language select {-->
+          <label for="language-select">Language</label>
+          <select class="selectpicker show-tick show-menu-arrow" id="language-select" name="select" aria-label="Select language" @change="updateLanguage" v-model="currentLanguage">
+            <option v-for="lang in supportedLanguages" :value="lang.value">{{ lang.name }}</option>
+          </select>
+          <!-- }-->
+          <!-- Run code-->
+          <!-- TODO fix onclick for everything!-->
+          <button class="btn btn-primary" onclick="evalAll()" aria-label="Run code"><span class="glyphicon glyphicon-play"></span>&nbsp; Run code</button>
+          <!-- Save-->
+          <button class="btn btn-default" onclick="saveToLocalStorage()" aria-label="Save"><span class="glyphicon glyphicon-save"></span>&nbsp; Save</button></span>
+        <!-- Output buttons--><span class="pull-right" id="output-toolbar">
+          <!-- Ugh. Don't access t directly! Bind to a model or something!-->
+          <button class="btn btn-default" onclick="iframe.contentWindow.t.reset()" title="Shortcut: r">Reset</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t.clear()" title="Shortcut: c">Clear</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t.pendown()" title="Shortcut: ,">Pen down</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t.penup()" title="Shortcut: .">Pen up</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t.show()" title="Shortcut: \">Show</button>
+          <button class="btn btn-default" onclick="iframe.contentWindow.t.hide()" title="Shortcut: \">Hide</button>
+          <!-- TODO: bind to state: pen up/down and show/hide--></span>
       </div>
       <!-- } End toolbar-->
       <!-- Code {-->

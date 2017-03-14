@@ -59,20 +59,6 @@ else {
 var iframe = document.querySelector("#output-iframe");
 init_sandbox(iframe);
 
-// Event listeners
-// Body keydown listener
-// $("body").keydown(function(event) {
-document.body.addEventListener("keydown", function(event) {
-	// https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
-	window.event = event;
-	var ctrlPressed = event.getModifierState("Control") || event.getModifierState("Meta");
-	var key = event.key;
-
-	if (ctrlPressed && key=="Enter") {
-		evalSelectionOrLine(iframe);
-	}
-});
-
 /* Helper functions */
 function evalSelectionOrLine(iframe) {
 	// Get selection, otherwise get current line
@@ -187,6 +173,7 @@ function init_sandbox(iframe) {
 // Save timer
 window.setInterval(saveToLocalStorage, 30000);
 
+/* Event listeners */
 // Save keybinding
 _editor.commands.addCommand({
     name: "save",
@@ -195,3 +182,16 @@ _editor.commands.addCommand({
 	},
     bindKey: {mac: "Cmd-S", win: "Ctrl-S"}
 })
+
+// Eval keybinding
+// $("body").keydown(function(event) {
+document.body.addEventListener("keydown", function(event) {
+	// https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
+	window.event = event;
+	var ctrlPressed = event.getModifierState("Control") || event.getModifierState("Meta");
+	var key = event.key;
+
+	if (ctrlPressed && key=="Enter") {
+		evalSelectionOrLine(iframe);
+	}
+});

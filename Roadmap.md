@@ -21,3 +21,9 @@
   - [ ] Menu for commands
     - Turtle commands: t.left, t.right, t.forward, t.backward
 	- Control: if, else, end, while
+
+- [ ] Buttons
+  - [ ] Fix button onclick handlers
+
+- Accessibility:
+  - ARIA labels for buttons, editor, output, etc
