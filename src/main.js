@@ -9,7 +9,7 @@ _editor.setOptions({
 // TODO
 _editor.getSession().setOptions({
 	// mode: 'ace/mode/' + app.currentLanguage,
-	mode: 'ace/mode/ruby',
+	mode: 'ace/mode/ruby'
 });
 
 /* Window event listeners */
@@ -19,6 +19,7 @@ window.addEventListener('resize', function() {
 	// TODO: resize p5 canvas as well
 });
 
+/******************************************************************************/
 // MVC stuff?
 var supportedLanguages = [
 	{ name: 'JavaScript', value: 'javascript' },
@@ -75,7 +76,13 @@ var _toolbar = new Vue({
 	data: {
 		supportedLanguages: supportedLanguages,
 		currentLanguage: 'ruby',
-		programCatalog: programCatalog
+		programCatalog: programCatalog,
+	},
+	computed: {
+		t: function() {
+			// return iframe.contentWindow.t;
+			return iframe.contentWindow.proxy;
+		}
 	},
 	methods: {
 		updateLanguage: function() {
@@ -91,6 +98,3 @@ var _toolbar = new Vue({
 		}
 	}
 });
-
-// TODO 
-var app = _toolbar;

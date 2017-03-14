@@ -91,7 +91,7 @@ Turtle.prototype.addText = function(str) {
 };
 
 // Add a placeholder to signify that there is a break between the previous vertex and the next vertex
-// (i.e., when using penup and setxy)
+// (i.e., when using penup, setxy, push, pop)
 // This is so a line segment does not erroneously follow the turtle
 // TODO: Although this could be a useful feature. Pick up and drop line?
 Turtle.prototype.addVoid = function() {
@@ -142,7 +142,7 @@ Turtle.prototype.clone = function() {
 	return newClone;
 }
 
-// Get a list containing itself, its clones, and their clones
+// Get a list containing itself, its clones, and their clones recursively
 Turtle.prototype.all = function() {
 	// Base case: no clones
 	if (this.clones.length == 0) {
@@ -158,13 +158,14 @@ Turtle.prototype.all = function() {
 	}
 }
 
-// TODO: use addCommand
-// Kill clones
-// As a side effect, all clones of the clones are killed as well
-Turtle.prototype.killClones = function() {
-	while (this.clones.length > 0) {
-		this.clones.pop();
-	}
+// TODO: addCommand('mergeClones')
+// Recursively merge clones' vertices, and kill the clones
+Turtle.prototype.mergeClones = function() {
+	var all = this.all();
+	// TODO: add void vertex between the different clones
+	var vertices = all.map((clone) => clone.vertices).reduce((a,b) => a.concat(b));
+	this.vertices = vertices;
+	this.killClones();
 }
 
 /* Turtle commands */
@@ -191,6 +192,9 @@ Turtle.prototype.width = function(n) { this.addCommand('width', n); }
 
 Turtle.prototype.reset = function() { this.addCommand('reset'); }
 
+// Cloning
+Turtle.prototype.killClones = function() { this.addCommand('killClones'); }
+
 // Urgent commands
 Turtle.prototype['show!'] = function() { this.addCommand_('show'); }
 Turtle.prototype['hide!'] = function() { this.addCommand_('hide'); }
@@ -202,6 +206,7 @@ Turtle.prototype['setxy!'] = function(x, y) { this.addCommand_('setxy', [x, y]);
 Turtle.prototype['setheading!'] = function(x, y) { this.addCommand_('setheading', [x, y]); }
 
 Turtle.prototype['stop!'] = function() { this.addCommand_('stop'); }
+Turtle.prototype['killClones!'] = function() { this.addCommand_('killClones'); }
 
 // Aliases
 Turtle.prototype.fd = Turtle.prototype.forward;
@@ -210,6 +215,8 @@ Turtle.prototype.rt = Turtle.prototype.right;
 Turtle.prototype.lt = Turtle.prototype.left;
 Turtle.prototype.goto = Turtle.prototype.setxy;
 Turtle.prototype.seth = Turtle.prototype.setheading;
+Turtle.prototype.up = Turtle.prototype.penup;
+Turtle.prototype.down = Turtle.prototype.pendown;
 
 Turtle.prototype['goto!'] = Turtle.prototype['setxy!'];
 Turtle.prototype['seth!'] = Turtle.prototype['setheading!'];
@@ -428,17 +435,24 @@ Turtle.prototype.executeNextCommand = function() {
 				// Why doesn't this work? this.commandQueue.length = 0;
 				while (this.commandQueue.length > 0) { this.commandQueue.pop(); }
 				break;
+
+			case 'killClones':
+				logText('Kill clones');
+				// Kill clones
+				// As a side effect, all clones of the clones are killed as well
+				while (this.clones.length > 0) { this.clones.pop(); }
+				break;
 		}
 	}
 }
 
 Turtle.prototype.debug = function() {
-	if (t.isDebug) {
+	if (this.isDebug) {
 		var s = '';
-		s += 'Position: ' + [t.x, t.y] + '\n';
-		s += 'Heading: ' + t.ang + '\n';
-		s += 'New position' + [t.x_new, t.y_new] + '\n';
-		s += 'New heading' + t.ang_new + '\n';
+		s += 'Position: ' + [this.x, this.y] + '\n';
+		s += 'Heading: ' + this.ang + '\n';
+		s += 'New position' + [this.x_new, this.y_new] + '\n';
+		s += 'New heading' + this.ang_new + '\n';
 
 		text(s, 50, 50); // TODO change coords, fix multiline
 	}
@@ -446,10 +460,34 @@ Turtle.prototype.debug = function() {
 
 /******************************************************************************/
 
+// This is the mother of all turtles (MOAT)
 var t = new Turtle();
 var canvas;
 var bgcolor = 0; // 200, 64
 var message = '';
+
+// Proxy for all clones
+var cloneProxy = new Proxy({}, {
+	get: (target, key) => {
+		// Output a function
+		return (...args) => {
+			var all = t.all();
+			// Proxy the function call to each clone
+			return all.map((clone) => {
+				var prop = clone[key];
+				if (typeof prop === 'function') {
+					clone[key](...args);
+				}
+			});
+		};
+	}
+	// set?
+});
+
+// Set the proxy: either just the MOAT, or all clones
+// TODO use a viewmodel for this
+var proxy = cloneProxy;
+// var proxy = t;
 
 // var sketch = {};
 // sketch.setup = function(p) {
@@ -523,16 +561,16 @@ function parseKey(key) {
 			break;
 
 		// WASD and hjkl bindings
-		case 'w': case 'k': t.forward(countPrefix ? countPrefix : 20); countPrefix = 0; break;
-		case 's': case 'j': t.backward(countPrefix ? countPrefix : 20); countPrefix = 0; break;
-		case 'd': case 'l': t.right(countPrefix ? countPrefix : 20); countPrefix = 0; break;
-		case 'a': case 'h': t.left(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 'w': case 'k': proxy.forward(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 's': case 'j': proxy.backward(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 'd': case 'l': proxy.right(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 'a': case 'h': proxy.left(countPrefix ? countPrefix : 20); countPrefix = 0; break;
 
-		case 'c': t['clear!'](); break;
-		case 'r': t['stop!'](); t['reset!'](); break;
-		case ',': case '¼': t['pendown!'](); break; // Comma
-		case '.': case '¾': t['penup!'](); break; // Period
-		case '\\': t.isVisible ? t['hide!']() : t['show!'](); break;
+		case 'c': proxy['clear!'](); break;
+		case 'r': proxy['stop!'](); proxy['reset!'](); proxy['killClones!'](); break;
+		case ',': case '¼': proxy['pendown!'](); break; // Comma
+		case '.': case '¾': proxy['penup!'](); break; // Period
+		case '\\': proxy.isVisible ? proxy['hide!']() : proxy['show!'](); break;
 
 		// Macro
 		case 'q':

@@ -81,7 +81,7 @@ function render(iframe, code) {
 
 	var result = {};
 
-	switch (app.currentLanguage) {
+	switch (_toolbar.currentLanguage) {
 	case "javascript":
 		result.compiledCode = code;
 		result.returnValue = w.eval(result.compiledCode); // TODO move to end
