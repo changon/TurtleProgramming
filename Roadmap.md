@@ -15,6 +15,7 @@
 - Turtle graphics:
   - [ ] Convert to D3/SVG for faster drawing times?
     - Canvas and processing is too slow, since it draws sequentially
+  - [ ] Display cursor position relative to turtle
 
 - [ ] Ace editor:
   - [ ] Autocomplete and syntax checking for Ruby and Python (JS syntax checking is built in)
