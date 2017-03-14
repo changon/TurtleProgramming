@@ -8,13 +8,8 @@ _editor.setOptions({
 
 // TODO
 _editor.getSession().setOptions({
+	// mode: "ace/mode/" + app.currentLanguage,
 	mode: "ace/mode/javascript",
-});
-
-var _languageSelect = document.getElementById("language-select");
-
-_languageSelect.addEventListener("change", function() {
-	_editor.getSession().setOption("mode", "ace/mode/" + _languageSelect.value);
 });
 
 /* Window event listeners */
@@ -24,4 +19,29 @@ window.addEventListener("resize", function() {
 	// TODO: resize p5 canvas as well
 });
 
+// MVC stuff?
+var supportedLanguages = [
+	{ name: 'JavaScript', value: 'javascript' },
+	{ name: 'Ruby', value: 'ruby' },
+	{ name: 'Python', value: 'python' },
+];
 
+var _languageSelect = new Vue({
+	el: '#language-select',
+	data: {
+		supportedLanguages: supportedLanguages,
+		currentLanguage: 'javascript'
+	},
+	methods: {
+		onchange: function(e) {
+			var lang = this.currentLanguage;
+			console.log("Language changed to: " + lang);
+			_editor.getSession().setOption("mode", "ace/mode/" + lang);
+		}
+	}
+});
+
+// TODO 
+var app = new Vue({
+	components: [ _languageSelect ]
+});

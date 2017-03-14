@@ -8,29 +8,31 @@
     <!-- TODO: use bower-->
     <!-- Ace-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js"></script>
-    <!-- JQuery-->
+    <!-- jQuery-->
     <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
     <!-- Bootstrap-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <!-- Optional theme-->
-    <!-- link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', integrity='sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp', crossorigin='anonymous')-->
     <!-- Bootstrap Select-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+    <!-- Vue-->
+    <script src="https://unpkg.com/vue"></script>
     <!-- }-->
   </head>
   <body>
     <!-- Main wrap {-->
     <div id="main-wrap">
-      <!-- Toolbar-->
+      <!-- Toolbar {-->
       <div id="toolbar">
-        <select class="selectpicker show-tick show-menu-arrow" id="language-select" name="select" aria-label="Select language">
-          <option value="javascript" selected="">JavaScript</option>
-          <option value="ruby">Ruby</option>
-          <option value="python">Python</option>
+        <!-- Language select {-->
+        <label for="language-select">Language</label>
+        <select class="selectpicker show-tick show-menu-arrow" id="language-select" name="select" aria-label="Select language" v-on:change="onchange" v-model="currentLanguage">
+          <option v-for="lang in supportedLanguages" v-bind:value="lang.value">{{ lang.name }}</option>
         </select>
+        <!-- }-->
       </div>
+      <!-- } End toolbar-->
       <!-- Code {-->
       <div id="code">
         <div id="editor">
