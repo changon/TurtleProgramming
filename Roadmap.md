@@ -1,23 +1,23 @@
-Some kind of MVC system:
+- [x] Some kind of MVC system: Using Vue for now
   - React
   - Backbone
   - Angular
 
-Manage dependencies:
+- [ ] Manage dependencies:
   - Webpack?
   - Bower?
 
-Database:
+- [ ] Database:
   - MongoDB
   - This probably means the app will no longer be standalone,
     and has to be a node app
 
-Turtle graphics:
-  - Convert to D3/SVG for faster drawing times
-  - Canvas and processing is too slow, since it draws sequentially
+- Turtle graphics:
+  - [ ] Convert to D3/SVG for faster drawing times
+    - Canvas and processing is too slow, since it draws sequentially
 
-Ace editor:
-  - Autocomplete and syntax checking for Ruby and Python (JS syntax checking is built in)
-  - Menu for commands
+- [ ] Ace editor:
+  - [ ] Autocomplete and syntax checking for Ruby and Python (JS syntax checking is built in)
+  - [ ] Menu for commands
     - Turtle commands: t.left, t.right, t.forward, t.backward
 	- Control: if, else, end, while

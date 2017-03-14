@@ -27,22 +27,22 @@
       <div id="toolbar">
         <!-- Language select {-->
         <label for="language-select">Language</label>
-        <select class="selectpicker show-tick show-menu-arrow" id="language-select" name="select" aria-label="Select language" v-on:change="onchange" v-model="currentLanguage">
-          <option v-for="lang in supportedLanguages" v-bind:value="lang.value">{{ lang.name }}</option>
+        <select class="selectpicker show-tick show-menu-arrow" id="language-select" name="select" aria-label="Select language" @change="updateLanguage" v-model="currentLanguage">
+          <option v-for="lang in supportedLanguages" :value="lang.value">{{ lang.name }}</option>
         </select>
         <!-- }-->
       </div>
       <!-- } End toolbar-->
       <!-- Code {-->
-      <div id="code">
-        <div id="editor">
+      <div class="col-lg-6" id="code">
+        <div id="editor" aria-label="Editor">
           <!-- Code goes here-->
         </div>
       </div>
       <!-- } End code-->
       <!-- Output {-->
-      <div id="output">
-        <iframe id="output-iframe">
+      <div class="col-lg-6" id="output">
+        <iframe id="output-iframe" aria-label="Output">
           <!-- Sandbox will be inserted here-->
         </iframe>
       </div>

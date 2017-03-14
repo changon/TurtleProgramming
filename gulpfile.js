@@ -24,8 +24,7 @@ gulp.task('dev', [ 'watch' ], function() {
 	gulp.src('.')
 		.pipe(webserver({
 			port: 8080,
-			livereload: true,
-			open: true
+			livereload: true
 		}));
 })
 

@@ -9,7 +9,7 @@ _editor.setOptions({
 // TODO
 _editor.getSession().setOptions({
 	// mode: "ace/mode/" + app.currentLanguage,
-	mode: "ace/mode/javascript",
+	mode: "ace/mode/ruby",
 });
 
 /* Window event listeners */
@@ -30,10 +30,10 @@ var _languageSelect = new Vue({
 	el: '#language-select',
 	data: {
 		supportedLanguages: supportedLanguages,
-		currentLanguage: 'javascript'
+		currentLanguage: 'ruby'
 	},
 	methods: {
-		onchange: function(e) {
+		updateLanguage: function(e) {
 			var lang = this.currentLanguage;
 			console.log("Language changed to: " + lang);
 			_editor.getSession().setOption("mode", "ace/mode/" + lang);
@@ -42,6 +42,4 @@ var _languageSelect = new Vue({
 });
 
 // TODO 
-var app = new Vue({
-	components: [ _languageSelect ]
-});
+var app = _languageSelect;

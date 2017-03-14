@@ -69,20 +69,27 @@ document.body.addEventListener("keydown", function(event) {
 	var key = event.key;
 
 	if (ctrlPressed && key=="Enter") {
-		render(iframe);
+		evalSelectionOrLine(iframe);
 	}
 });
 
 /* Helper functions */
-function render(iframe) {
-	// TODO: Get whole text or just selected text?
-	// var js_code = _editor.getValue();
+function evalSelectionOrLine(iframe) {
 	// Get selection, otherwise get current line
 	// TODO flash code on run
-	// var code = _editor.getSelectedText();
-	var code = _editor.getValue();
+	var code = _editor.getSelectedText();
 	code = code ? code : _editor.session.getLine(_editor.getCursorPosition().row);
 
+	render(iframe, code);
+}
+
+function evalAll() {
+	// TODO: flash code
+	var code = _editor.getValue();
+	render(iframe, code);
+}
+
+function render(iframe, code) {
 	// Use iframe's contentWindow as namespace
 	var w = iframe.contentWindow;
 

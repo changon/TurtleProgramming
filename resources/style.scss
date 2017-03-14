@@ -1,0 +1,57 @@
+// body, #main-wrap {
+// 	padding: 0;
+// 	margin: 0;
+// 	width: 100vw; /* 100%; */
+// 	height: 100vh; /* 100%; */
+// }
+// 
+
+#code, #output {
+	display: block;
+	// position: absolute; /* relative */
+	padding: 0;
+	margin: 0;
+	// width: 50%; /* 50vw */
+	// height: 100%; /* 100vh */
+}
+
+// 
+// #code {
+// 	left: 0;
+// }
+// 
+// #output {
+// 	left: 50%;
+// }
+
+/* Ace Editor */
+/* Beware: don't change this or it'll never work again */
+#editor {
+	position: relative;
+	// position: absolute;
+	// top: 0; right: 0; bottom: 0; left: 0;
+	padding: 0;
+	margin: 0;
+	border-right: 1px solid #ccc;
+	/* this seems a bit hackish */
+	min-width: 500px;
+	min-height: 800px;
+	/* doesn't work */
+	max-height: 100%;
+	max-width: 100%;
+}
+
+#output-iframe {
+	position: relative;
+	// position: absolute;
+	// top: 0; right: 0; bottom: 0; left: 0;
+	padding: 0;
+	margin: 0;
+	border: none; /* exterminate the hideous border */
+	/* this seems a bit hackish */
+	min-width: 800px;
+	min-height: 800px;
+	/* doesn't work */
+	max-height: 100%;
+	max-width: 100%;
+}

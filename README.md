@@ -82,5 +82,6 @@ TurtleScript?  https://github.com/cscott/TurtleScript
 Cycloids?
 http://www.di.unito.it/~barbara/MicRobot/AttiEuroLogo2007/proceedings/W-Foltynowicz.pdf
 
-Ramda two-pane editor:
-http://ramdajs.com/repl
+[Ramda two-pane editor](http://ramdajs.com/repl)
+
+[Bootstrap + Ace editor](http://www.bootply.com/hYVxKShFtM)

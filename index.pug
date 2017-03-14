@@ -36,21 +36,23 @@ html
 				label(for='language-select') Language
 				select#language-select.selectpicker.show-tick.show-menu-arrow(
 					name='select', aria-label='Select language',
-					v-on:change='onchange',
+					@change='updateLanguage',
 					v-model='currentLanguage'
 				)
-					option(v-for='lang in supportedLanguages' v-bind:value='lang.value') {{ lang.name }}
+					option(v-for='lang in supportedLanguages', :value='lang.value') {{ lang.name }}
 				// }
 
 			// } End toolbar
+
 			// Code {
-			#code
-				#editor
+			#code.col-lg-6
+				#editor(aria-label='Editor')
 					// Code goes here
 			// } End code
+
 			// Output {
-			#output
-				iframe#output-iframe
+			#output.col-lg-6
+				iframe#output-iframe(aria-label='Output')
 					// Sandbox will be inserted here
 			// } End output
 		// } End main wrap
