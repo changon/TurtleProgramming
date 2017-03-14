@@ -44,6 +44,26 @@ html
 						option(v-for='lang in supportedLanguages', :value='lang.value') {{ lang.name }}
 					// }
 
+					// Program catalog
+					// TODO use a v-for, dynamically bind, depend on language
+					span.dropdown
+						button#program-catalog.btn.btn-default.dropdown-toggle(
+							type='button',
+							data-toggle='dropdown',
+							aria-haspopup='true',
+							aria-expanded='false'
+						) Program catalog #[span.caret]
+						ul.dropdown-menu(aria-labelledby='program-catalog')
+							template(v-for='group in programCatalog')
+								li.dropdown-header {{ group.category }}
+								template(v-for='command in group.commands')
+									li: a(href='#',
+										@click='insertCode(command.expand)'
+									)
+										| {{ command.name }}
+								li.divider(role='separator')
+
+
 					// Run code
 					// TODO fix onclick for everything!
 					button.btn.btn-primary(onclick='evalAll()', aria-label='Run code')

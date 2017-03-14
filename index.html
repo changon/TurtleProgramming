@@ -32,6 +32,18 @@
             <option v-for="lang in supportedLanguages" :value="lang.value">{{ lang.name }}</option>
           </select>
           <!-- }-->
+          <!-- Program catalog-->
+          <!-- TODO use a v-for, dynamically bind, depend on language--><span class="dropdown">
+            <button class="btn btn-default dropdown-toggle" id="program-catalog" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Program catalog <span class="caret"></span></button>
+            <ul class="dropdown-menu" aria-labelledby="program-catalog">
+              <template v-for="group in programCatalog">
+                <li class="dropdown-header">{{ group.category }}</li>
+                <template v-for="command in group.commands">
+                  <li><a href="#" @click="insertCode(command.expand)">{{ command.name }}</a></li>
+                </template>
+                <li class="divider" role="separator"></li>
+              </template>
+            </ul></span>
           <!-- Run code-->
           <!-- TODO fix onclick for everything!-->
           <button class="btn btn-primary" onclick="evalAll()" aria-label="Run code"><span class="glyphicon glyphicon-play"></span>&nbsp; Run code</button>

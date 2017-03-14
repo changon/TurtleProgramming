@@ -21,6 +21,7 @@
   - [ ] Menu for commands
     - Turtle commands: t.left, t.right, t.forward, t.backward
 	- Control: if, else, end, while
+  - [ ] Drag to edit numbers
 
 - [ ] Buttons
   - [ ] Fix button onclick handlers
