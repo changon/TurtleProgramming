@@ -329,10 +329,12 @@ Turtle.prototype.executeNextCommand = function() {
 			case 'push':
 				logText('Saving state');
 				this.pushState();
+				this.addVoid();
 				break;
 			case 'pop':
 				logText('Restoring state');
 				this.popState();
+				this.addVoid();
 				break;
 			case 'pendown':
 				logText('Pen down');
@@ -364,7 +366,8 @@ Turtle.prototype.executeNextCommand = function() {
 				logText('Stop');
 
 				// Reset command queue
-				this.commandQueue.length = 0;
+				// Why doesn't this work? this.commandQueue.length = 0;
+				while (this.commandQueue.length > 0) { this.commandQueue.pop(); }
 				break;
 		}
 	}

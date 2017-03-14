@@ -13,7 +13,7 @@
     and has to be a node app
 
 - Turtle graphics:
-  - [ ] Convert to D3/SVG for faster drawing times
+  - [ ] Convert to D3/SVG for faster drawing times?
     - Canvas and processing is too slow, since it draws sequentially
 
 - [ ] Ace editor:
@@ -23,8 +23,10 @@
 	- Control: if, else, end, while
   - [ ] Drag to edit numbers
 
-- [ ] Buttons
+- [ ] Toolbar
   - [ ] Fix button onclick handlers
+  - [ ] Bind to t.scale
+  - [ ] Bind to commandQueue.length
 
 - Accessibility:
   - ARIA labels for buttons, editor, output, etc

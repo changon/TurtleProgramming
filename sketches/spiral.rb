@@ -13,11 +13,11 @@ def rotation()
     n = 0
     #colormode(255)
     c = 0
-    #pencolor(c,c,c)
+    t.color(c,c,c)
 
     120.times do
         c += 255.0/120
-        # pencolor(c,c,c)
+        t.color(c,c,c)
         hex(n)
         n += 1
         t.left(3)
