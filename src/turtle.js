@@ -34,6 +34,10 @@ var Turtle = function() {
 	this.commandQueue = []; // queue of commands
 	this.commandFinished = true;
 	this.vertices = []; // list of vertices
+
+	// Cloning
+	this.clones = []; // list of clones
+	this.parent = null; // parent of clone
 };
 
 Turtle.prototype.addCommand = function(cmd, args) {
@@ -114,9 +118,54 @@ Turtle.prototype.popState = function() {
 		this.ang_new = lastState.angle;
 		this.color_ = lastState.color;
 		this.width_ = lastState.width;
-		console.log(this);
+		// console.log(this);
 	}
+	return lastState;
 };
+
+/* Cloning */
+Turtle.prototype.clone = function() {
+	this.pushState();
+	var state = this.popState();
+	var newClone = new Turtle();
+	newClone.parent = this;
+	// TODO this is abusing push/pop so much...
+	newClone.stateStack.push(state);
+	newClone.popState();
+	// TODO probably should refactor these curr = new assignments somewhere...
+	newClone.x = newClone.x_new;
+	newClone.y = newClone.y_new;
+	newClone.ang = newClone.ang_new;
+
+	// Add the clone to the list of clones
+	this.clones.push(newClone);
+	return newClone;
+}
+
+// Get a list containing itself, its clones, and their clones
+Turtle.prototype.all = function() {
+	// Base case: no clones
+	if (this.clones.length == 0) {
+		return [ this ];
+	}
+	// Recursive case
+	else {
+		var flattened = [ this ];
+		this.clones.forEach(function(clone, i) {
+			flattened = flattened.concat(clone.all());
+		});
+		return flattened;
+	}
+}
+
+// TODO: use addCommand
+// Kill clones
+// As a side effect, all clones of the clones are killed as well
+Turtle.prototype.killClones = function() {
+	while (this.clones.length > 0) {
+		this.clones.pop();
+	}
+}
 
 /* Turtle commands */
 // Move and draw
@@ -211,6 +260,11 @@ Turtle.prototype.update = function() {
 			this.ang = this.ang_new;
 		}
 	}
+
+	// Update clones
+	this.clones.forEach(function(clone, i) {
+		clone.update();
+	})
 };
 
 Turtle.prototype.draw = function() {
@@ -270,6 +324,11 @@ Turtle.prototype.draw = function() {
 	pop(); // }
 
 	pop(); // }
+
+	// Draw clones
+	this.clones.forEach(function(clone, i) {
+		clone.draw();
+	})
 };
 
 Turtle.prototype.executeNextCommand = function() {

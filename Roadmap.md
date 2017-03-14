@@ -27,6 +27,7 @@
   - [ ] Fix button onclick handlers
   - [ ] Bind to t.scale
   - [ ] Bind to commandQueue.length
+  - [ ] Select clones, display how many there are
 
 - Accessibility:
   - ARIA labels for buttons, editor, output, etc
