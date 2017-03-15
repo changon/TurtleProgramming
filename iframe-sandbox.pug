@@ -5,6 +5,8 @@ html
 		title Sandbox
 		link(rel='stylesheet', href='./resources/iframe-style.css')
 
+		#test
+
 		// p5.js
 		script(type='text/javascript', src='./resources/p5.min.js')
 
@@ -25,7 +27,7 @@ html
 		// Skulpt
 		script(type='text/javascript', src='http://www.skulpt.org/static/skulpt.min.js')
 		script(type='text/javascript', src='http://www.skulpt.org/static/skulpt-stdlib.js')
-		script(type='text/python', src='./src/turtle-skulpt.py')
+		// script(type='text/javascript', src='http://www.skulpt.org/static/builtin.js') // not needed?
 		script.
 			// Configure skulpt
 			Sk.pre = 'output';
@@ -35,12 +37,15 @@ html
 					if (Sk.builtinFiles === undefined || Sk.builtinFiles['files'][x] === undefined) {
 						throw "File not found: '" + x + "'"; }
 					return Sk.builtinFiles['files'][x];
-				}
+				},
+				// Retain globals, otherwise they will be lost
+				retainglobals: true
 			});
 			// (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
 
 		// Turtle
 		script(type='text/javascript', src='./src/turtle.js')
+		script(type='text/javascript', src='./src/turtle-skulpt.js')
 
 	body
 

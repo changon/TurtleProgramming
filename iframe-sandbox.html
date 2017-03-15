@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Sandbox</title>
     <link rel="stylesheet" href="./resources/iframe-style.css">
+    <div id="test"></div>
     <!-- p5.js-->
     <script type="text/javascript" src="./resources/p5.min.js"></script>
     <!-- script(type='text/javascript', src="./resources/p5.gibber.min.js")-->
@@ -23,7 +24,7 @@
     <!-- Skulpt-->
     <script type="text/javascript" src="http://www.skulpt.org/static/skulpt.min.js"></script>
     <script type="text/javascript" src="http://www.skulpt.org/static/skulpt-stdlib.js"></script>
-    <script type="text/python" src="./src/turtle-skulpt.py"></script>
+    <!-- script(type='text/javascript', src='http://www.skulpt.org/static/builtin.js') // not needed?-->
     <script>
       // Configure skulpt
       Sk.pre = 'output';
@@ -33,13 +34,16 @@
       		if (Sk.builtinFiles === undefined || Sk.builtinFiles['files'][x] === undefined) {
       			throw "File not found: '" + x + "'"; }
       		return Sk.builtinFiles['files'][x];
-      	}
+      	},
+      	// Retain globals, otherwise they will be lost
+      	retainglobals: true
       });
       // (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
       
     </script>
     <!-- Turtle-->
     <script type="text/javascript" src="./src/turtle.js"></script>
+    <script type="text/javascript" src="./src/turtle-skulpt.js"></script>
   </head>
   <body></body>
 </html>

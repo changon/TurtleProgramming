@@ -6,6 +6,8 @@
 // https://github.com/skulpt/skulpt/blob/93d0dc6f19ba2008716787f737f2003cf6ea5bb9/src/lib/math.js
 // https://github.com/skulpt/skulpt/blob/master/src/lib/processing.js
 
+// Wrap turtle in a module
+// This exports all the properties and methods of `t`
 Sk.builtinFiles.files['src/lib/t.js'] =
 `var $builtinmodule = function(name) {
 	var mod = {};
@@ -31,3 +33,9 @@ Sk.builtinFiles.files['src/lib/t.js'] =
 
 	return mod;
 }`;
+
+// Run in main
+Sk.importModuleInternal_('repl', false, "__main__", `
+# Import turtle
+import t
+`, true);

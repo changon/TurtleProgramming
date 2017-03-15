@@ -125,6 +125,8 @@ Turtle.prototype.popState = function() {
 
 /* Cloning */
 Turtle.prototype.clone = function() {
+	logText('Clone');
+
 	this.pushState();
 	var state = this.popState();
 	var newClone = new Turtle();

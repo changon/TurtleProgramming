@@ -92,7 +92,7 @@ function render(iframe, code) {
 		break;
 	case 'python':
 		var myPromise = w.Sk.misceval.asyncToPromise(function() {
-			return w.Sk.importMainWithBody('<stdin>', false, code, true);
+			return w.Sk.importMainWithBody('repl', false, code, true);
 		});
 		myPromise.then(function(mod) {
 			result.compiledCode = mod.$js;

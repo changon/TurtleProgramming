@@ -1,6 +1,6 @@
 # http://jython.tobiaskohn.ch/turtlex_tree.html
 
-import turtle
+import t
 
 ANGLE = 30
 
@@ -12,21 +12,18 @@ def makeTree(s, depth = 4):
     t.forward(s)
     if s >= 1:
         # save state
-        x, y = t.pos()
-        hd = t.heading()
+        t.push()
         t.left(ANGLE)
         makeTree(2*s/3, depth+1)
         # restore state
-        t.setpos(x, y)
-        t.setheading(hd)
+        t.pop()
         t.right(ANGLE)
         makeTree(2*s/3, depth+1)
 
 
 
 ### MAIN ###
-t = turtle.Turtle()
-t.hideturtle()
+t.hide()
 t.clear()
-t.setpos(0, -300)
+t.setxy(0, -300)
 makeTree(200)
