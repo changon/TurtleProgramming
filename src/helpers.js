@@ -1,9 +1,3 @@
-'use strict';
-
-// TODO add highlight
-// https://stackoverflow.com/questions/27531860/how-to-highlight-a-certain-line-in-ace-editor
-
-/* Helpers */
 // Get contents stored in localStorage
 // TODO use jquery?
 function readFromLocalStorage() {
@@ -43,23 +37,6 @@ function getURLVars() {
 	return vars;
 }
 
-// TODO this is ugly
-var urlVars = getURLVars();
-var program = urlVars['program']; // || 'sketch';
-
-// If a program is specified, load it
-// Else, read from localStorage
-if (program) {
-	readFileFromURL('./sketches/' + program + '.rb');
-}
-else {
-	readFromLocalStorage();
-}
-
-var iframe = document.querySelector('#output-iframe');
-init_sandbox(iframe);
-
-/* Helper functions */
 function evalSelectionOrLine(iframe) {
 	// Get selection, otherwise get current line
 	// TODO flash code on run
@@ -134,29 +111,3 @@ function init_sandbox(iframe) {
 	window.iframe = iframe;
 
 }
-
-// Save timer
-window.setInterval(saveToLocalStorage, 30000);
-
-/* Event listeners */
-// Save keybinding
-_editor.commands.addCommand({
-    name: 'save',
-    exec: function() {
-		saveToLocalStorage();
-	},
-    bindKey: {mac: 'Cmd-S', win: 'Ctrl-S'}
-})
-
-// Eval keybinding
-// $('body').keydown(function(event) {
-document.body.addEventListener('keydown', function(event) {
-	// https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
-	window.event = event;
-	var ctrlPressed = event.getModifierState('Control') || event.getModifierState('Meta');
-	var key = event.key;
-
-	if (ctrlPressed && key=='Enter') {
-		evalSelectionOrLine(iframe);
-	}
-});
