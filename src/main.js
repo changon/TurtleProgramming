@@ -98,8 +98,8 @@ var _toolbar = new Vue({
 			_editor.insert(sanitized);
 		}
 	},
-	// TODO use mounted? this should be wrapped in vm for ace, and run after ace loads
-	created: function() {
+	// TODO this should be wrapped in vm for ace, and run after ace loads
+	mounted: function() {
 		// TODO rewrite using Backbone.router
 		var urlVars = getURLVars();
 
@@ -107,7 +107,7 @@ var _toolbar = new Vue({
 		// Else, read from localStorage
 		var program = urlVars['program']; // || 'sketch';
 		if (program) {
-			var url = './sketches/' + program + '.rb'
+			var url = './sketches/' + program;
 			readFileFromURL(url);
 			console.log('Read sketch from ' + url);
 		}

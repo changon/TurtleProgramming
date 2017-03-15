@@ -18,6 +18,7 @@ This starts a server on port 8080. The following URL parameters are supported:
 
 - `program`: Loads a program stored in `./sketches`
 - `language`: Any of the supported languages
+- `autorun`: Autoruns the program
 
 http://localhost:8080/?program=clones&language=ruby
 

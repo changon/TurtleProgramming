@@ -1,0 +1,17 @@
+# Guess a number
+# Enter 0 to stop/cheat
+
+secret = randomInt(1, 100)
+guess = -1
+msg = ''
+while (guess != secret)
+    guess = promptInt(msg + '\nGuess a number between 1 and 100:')
+    if typeof guess isnt 'number' or guess < 1 or guess > 100
+        msg = 'Please enter a number between 1 and 100!'
+    else if guess == 0
+        guess = secret # Cheat a bit
+    else if guess < secret
+        msg = 'Guess higher!'
+    else if guess > secret
+        msg = 'Guess lower!'
+alert('You win!')

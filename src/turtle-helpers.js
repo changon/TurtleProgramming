@@ -22,3 +22,20 @@ function repeat(n, fn) {
 		fn(i);
 	}
 }
+
+// Generates a random integer
+// Uses p5js's `random` function
+function randomInt(n) {
+	return Math.floor(random(n));
+}
+
+// Prompts with a message and an optional default value
+// If the result cannot be parsed as an integer,
+// `null` is returned instead
+function promptInt(message, default_) {
+	var parsed = parseInt(prompt(message, default_));
+	if (isNaN(parsed)) {
+		return null;
+	}
+	return parsed;
+}
