@@ -1,9 +1,30 @@
+/* RequireJS config */
+// https://github.com/ajaxorg/ace/issues/1017
+/*
+requirejs.config({
+	baseUrl: window.location.protocol + "//" + window.location.host
+		+ window.location.pathname.split("/").slice(0, -1).join("/"),
+
+	paths: {
+		'ace': [
+			'https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js',
+			'https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js'
+		]
+	}
+});
+*/
+
 /* Load Ace editor */
+// var ace = require(['ace/ace']);
+
 var _editor = ace.edit('editor');
 // Options: https://github.com/ajaxorg/ace/wiki/Embedding-API
 _editor.setOptions({
 	// editor.renderer
 	theme: 'ace/theme/monokai',
+	enableBasicAutocompletion: true,
+	enableLiveAutocompletion: false,
+	enableSnippets: true
 });
 
 // TODO
@@ -11,6 +32,15 @@ _editor.getSession().setOptions({
 	// mode: 'ace/mode/' + app.currentLanguage,
 	mode: 'ace/mode/ruby'
 });
+
+// Snippets
+// var snippetManager = require('ace/snippets').snippetManager;
+// var snippets = [
+// 	'snippet hello 	\n\t puts "it works!"'
+// ];
+// snippets.forEach((snippet) => {
+// 	snippetManager.register(snippetManager.parseSnippetFile(snippet)/*, 'ruby'*/);
+// );
 
 /* Window event listeners */
 // Resize listener

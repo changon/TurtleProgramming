@@ -5,10 +5,14 @@ html
 		meta(charset='utf-8')
 		link(rel='stylesheet', href='./resources/style.css')
 		// Libraries {
-		// TODO: use bower
+		// TODO: use bower, requirejs
+
+		// RequireJS
+		// script(src='https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.min.js')
 
 		// Ace
 		script(src='https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js')
+		script(src='https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js')
 
 		// jQuery
 		script(src='https://code.jquery.com/jquery-3.1.1.js', integrity='sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=', crossorigin='anonymous')
@@ -100,8 +104,8 @@ html
 
 			// Code {
 			#code.col-md-6.col-lg-6
+				// Code goes under #editor
 				#editor(aria-label='Editor')
-					// Code goes here
 			// } End code
 
 			// Output {
