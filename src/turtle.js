@@ -247,7 +247,7 @@ Turtle.prototype.update = function() {
 		}
 		// Otherwise move towards new position
 		else {
-			var diff = new p5Vector(this.x_new - this.x, this.y_new - this.y);
+			var diff = new p5.Vector(this.x_new - this.x, this.y_new - this.y);
 			var dist = diff.mag();
 			var dir = diff.normalize(); // destructive
 
@@ -607,6 +607,7 @@ function keyPressed() {
 
 function keyTyped() {
 	parseKey(key);
+	console.log('pressed'); // TODO tmp
 }
 
 // TODO: make macros not based on keypress

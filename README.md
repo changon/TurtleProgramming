@@ -22,6 +22,17 @@ gulp dev
 ![](Screenshots/Clones%20--%20Pattern.png)
 ![](Screenshots/Clones%20--%20Plant%20roots.png)
 
+## Libraries versions
+- [p5.js](https://p5js.org/) 0.5.7
+- [CoffeeScript](http://coffeescript.org/) compiler v1.12.4
+- [Opal](http://opalrb.org/) 0.10.1
+- [Skulpt](http://www.skulpt.org/)
+- [Please JS](http://www.checkman.io/please/)
+
+## Known caveats and bugs
+- When using Ruby, globals are not retained
+- After upgrading to p5.js 0.5.7, holding the key down does not trigger repeated calls of keyTyped()
+
 ## To Program
 - bulid reference side bar
 - build module side bar
