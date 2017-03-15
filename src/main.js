@@ -66,6 +66,9 @@ var programCatalog = [
 		"require 'native'\n" +
 		"$t = Native(`t`)\n" +
 		"def t(); $t; end\n"
+	},
+	{ name: 'Skulpt workaround', expand: 
+		"import 't'\n"
 	}
 	]
 }

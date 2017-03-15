@@ -98,7 +98,7 @@ function render(iframe, code) {
 			result.compiledCode = mod.$js;
 			result.returnValue = mod.$d;
 		}, function(err) {
-			console.err(err.toString());
+			console.error(err.toString());
 		});
 		break;
 	}
@@ -118,7 +118,7 @@ function init_sandbox(iframe) {
 	// iframe.contentDocument.close();
 	
 	// Load iframe
-	iframe.src = './iframe-sandbox.html';
+	// iframe.src = './iframe-sandbox.html';
 
 	// Autorun after a delay (this is so hackish)
 	// TODO replace with an event listener
