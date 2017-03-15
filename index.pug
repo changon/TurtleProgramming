@@ -45,7 +45,7 @@ html
 						@change='updateLanguage',
 						v-model='currentLanguage'
 					)
-						option(v-for='lang in supportedLanguages', :value='lang.value') {{ lang.name }}
+						option(v-for='(lang, langVal) in supportedLanguages', :value='langVal') {{ lang }}
 					// }
 
 					// Program catalog

@@ -1,6 +1,6 @@
 # Turtle programming sandbox
 
-## Setup
+## Setup and usage
 
 Install dependencies:
 
@@ -14,6 +14,13 @@ Run server:
 gulp dev
 ```
 
+This starts a server on port 8080. The following URL parameters are supported:
+
+- `program`: Loads a program stored in `./sketches`
+- `language`: Any of the supported languages
+
+http://localhost:8080/?program=clones&language=ruby
+
 ## Screenshots
 ![](Screenshots/B1A4%20Good%20Timing.png)
 ![](Screenshots/Koch%20Snowflake.png)
@@ -21,6 +28,12 @@ gulp dev
 ![](Screenshots/Clones%20--%20Binary%20tree.png)
 ![](Screenshots/Clones%20--%20Pattern.png)
 ![](Screenshots/Clones%20--%20Plant%20roots.png)
+
+## Supported languages
+- JavaScipt (native, best support)
+- CoffeeScript (almost native, next-best support)
+- Ruby (good support)
+- Python (decent support)
 
 ## Libraries versions
 - [p5.js](https://p5js.org/) 0.5.7

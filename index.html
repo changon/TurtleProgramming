@@ -32,7 +32,7 @@
           <!-- Language select {-->
           <label for="language-select">Language</label>
           <select class="selectpicker show-tick show-menu-arrow" id="language-select" name="select" aria-label="Select language" @change="updateLanguage" v-model="currentLanguage">
-            <option v-for="lang in supportedLanguages" :value="lang.value">{{ lang.name }}</option>
+            <option v-for="(lang, langVal) in supportedLanguages" :value="langVal">{{ lang }}</option>
           </select>
           <!-- }-->
           <!-- Program catalog-->

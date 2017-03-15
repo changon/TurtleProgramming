@@ -103,17 +103,7 @@ function init_sandbox(iframe) {
 	// Load iframe
 	// iframe.src = './iframe-sandbox.html';
 
-	// Autorun after a delay (this is so hackish)
-	// TODO replace with an event listener
-	if (urlVars['autorun']) {
-		iframe.contentWindow.setTimeout(function() {
-			_editor.selectAll();
-			render(iframe);
-			_editor.clearSelection();
-		}, 500);
-	}
-
-	// Export iframe to main window
-	window.iframe = iframe;
+	// Export iframe's contentWindow to main window
+	window.w = iframe.contentWindow;
 
 }

@@ -1,10 +1,12 @@
 // MVC stuff?
-var supportedLanguages = [
-	{ name: 'JavaScript', value: 'javascript' },
-	{ name: 'CoffeeScript', value: 'coffeescript' },
-	{ name: 'Ruby', value: 'ruby' },
-	{ name: 'Python', value: 'python' },
-];
+var defaultLanguage = 'coffee';
+
+var supportedLanguages = {
+	'javascript': 'JavaScript',
+	'coffee': 'CoffeeScript',
+	'ruby': 'Ruby',
+	'python': 'Python',
+};
 
 // TODO: turn into snippets
 var programCatalog = [

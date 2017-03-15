@@ -29,8 +29,7 @@ _editor.setOptions({
 
 // TODO
 _editor.getSession().setOptions({
-	// mode: 'ace/mode/' + app.currentLanguage,
-	mode: 'ace/mode/ruby'
+	mode: 'ace/mode/' + defaultLanguage
 });
 
 // Snippets
@@ -68,11 +67,16 @@ _editor.commands.addCommand({
     bindKey: {mac: 'Cmd-Enter', win: 'Ctrl-Enter'}
 });
 
+// Load iframe
+var iframe = document.querySelector('#output-iframe');
+init_sandbox(iframe);
+
+// Load Vue viewmodels
 var _toolbar = new Vue({
 	el: '#toolbar',
 	data: {
 		supportedLanguages: supportedLanguages,
-		currentLanguage: 'coffeescript',
+		currentLanguage: defaultLanguage,
 		programCatalog: programCatalog,
 	},
 	computed: {
@@ -93,28 +97,48 @@ var _toolbar = new Vue({
 			var sanitized = code.split(/\$[0-9]/).join('');
 			_editor.insert(sanitized);
 		}
+	},
+	// TODO use mounted? this should be wrapped in vm for ace, and run after ace loads
+	created: function() {
+		// TODO rewrite using Backbone.router
+		var urlVars = getURLVars();
+
+		// If a program is specified, load it
+		// Else, read from localStorage
+		var program = urlVars['program']; // || 'sketch';
+		if (program) {
+			var url = './sketches/' + program + '.rb'
+			readFileFromURL(url);
+			console.log('Read sketch from ' + url);
+		}
+		else {
+			readFromLocalStorage();
+		}
+
+		// If a language is specified, check to make sure
+		// it is supported, and load it
+		var language = urlVars['language'];
+		if (language && language in supportedLanguages) {
+			console.log('Using language ' + language);
+			this.currentLanguage = language;
+		}
+
+		this.updateLanguage();
+
+		// Autorun after a delay (this is so hackish)
+		// TODO replace with an event listener
+		if (urlVars['autorun']) {
+			console.log('Autorunning');
+			setTimeout(function() {
+				evalAll();
+			}, 2000);
+		}
 	}
 });
 
 
 // TODO add highlight
 // https://stackoverflow.com/questions/27531860/how-to-highlight-a-certain-line-in-ace-editor
-
-// TODO rewrite using Backbone.router
-var urlVars = getURLVars();
-var program = urlVars['program']; // || 'sketch';
-
-// If a program is specified, load it
-// Else, read from localStorage
-if (program) {
-	readFileFromURL('./sketches/' + program + '.rb');
-}
-else {
-	readFromLocalStorage();
-}
-
-var iframe = document.querySelector('#output-iframe');
-init_sandbox(iframe);
 
 // Save timer
 window.setInterval(saveToLocalStorage, 30000);
