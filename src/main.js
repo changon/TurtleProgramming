@@ -72,7 +72,7 @@ var _toolbar = new Vue({
 	el: '#toolbar',
 	data: {
 		supportedLanguages: supportedLanguages,
-		currentLanguage: 'ruby',
+		currentLanguage: 'coffeescript',
 		programCatalog: programCatalog,
 	},
 	computed: {

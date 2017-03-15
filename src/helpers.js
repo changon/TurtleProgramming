@@ -63,6 +63,12 @@ function render(iframe, code) {
 		result.compiledCode = code;
 		result.returnValue = w.eval(result.compiledCode);
 		break;
+	case 'coffeescript':
+		result.compiledCode = w.CoffeeScript.compile(code);
+		// Strip out the first and last lines, so that it is no longer wrapped in a closure
+		result.compiledCode = result.compiledCode.split('\n').slice(1,-2).join('\n'); // two newlines at the end
+		result.returnValue = w.eval(result.compiledCode);
+		break;
 	case 'ruby':
 		result.compiledCode = w.Opal.compile(code);
 		result.returnValue = w.eval(result.compiledCode);

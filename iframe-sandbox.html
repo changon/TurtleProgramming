@@ -14,13 +14,14 @@
     var setup1 = function(){}; var draw1 = function(){};
     
     -->
+    <!-- Coffeescript-->
+    <script type="text/javascript" src="http://coffeescript.org/v1/browser-compiler/coffee-script.js"></script>
     <!-- TODO load opal asynchronously to not slow down page loading time-->
     <!-- Opal-->
     <script type="text/javascript" src="./resources/opal.js"></script>
     <script type="text/javascript" src="./resources/opal-parser.js"></script>
     <script type="text/javascript" src="./resources/opal-native.js"></script>
     <script type="text/javascript">Opal.load("opal-parser")</script>
-    <script type="text/ruby" src="./src/turtle-opal.rb"></script>
     <!-- Skulpt-->
     <script type="text/javascript" src="http://www.skulpt.org/static/skulpt.min.js"></script>
     <script type="text/javascript" src="http://www.skulpt.org/static/skulpt-stdlib.js"></script>
@@ -43,6 +44,8 @@
     </script>
     <!-- Turtle-->
     <script type="text/javascript" src="./src/turtle.js"></script>
+    <script type="text/javascript" src="./src/turtle-helpers.js"></script>
+    <script type="text/ruby" src="./src/turtle-opal.rb"></script>
     <script type="text/javascript" src="./src/turtle-skulpt.js"></script>
   </head>
   <body></body>
