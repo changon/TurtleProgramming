@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // TODO add highlight
 // https://stackoverflow.com/questions/27531860/how-to-highlight-a-certain-line-in-ace-editor
@@ -7,7 +7,7 @@
 // Get contents stored in localStorage
 // TODO use jquery?
 function readFromLocalStorage() {
-	var data = localStorage.getItem("editor_contents");
+	var data = localStorage.getItem('editor_contents');
 	if (data) {
 		_editor.setValue(data, -1); // Replace everything
 		return true;
@@ -18,16 +18,16 @@ function readFromLocalStorage() {
 }
 
 function saveToLocalStorage() {
-	console.log("Saving...")
+	console.log('Saving...')
 	var data = _editor.getValue();
-	localStorage.setItem("editor_contents", data);
+	localStorage.setItem('editor_contents', data);
 }
 
 // Get contents of sketch.js without running
 function readFileFromURL(url) {
 	$.get(url, function(data) {
 		_editor.setValue(data, -1); // Replace everything
-	}, "text");
+	}, 'text');
 }
 
 // Read a page's GET URL variables and return them as an associative array.
@@ -45,18 +45,18 @@ function getURLVars() {
 
 // TODO this is ugly
 var urlVars = getURLVars();
-var program = urlVars["program"]; // || "sketch";
+var program = urlVars['program']; // || 'sketch';
 
 // If a program is specified, load it
 // Else, read from localStorage
 if (program) {
-	readFileFromURL("./sketches/" + program + ".rb");
+	readFileFromURL('./sketches/' + program + '.rb');
 }
 else {
 	readFromLocalStorage();
 }
 
-var iframe = document.querySelector("#output-iframe");
+var iframe = document.querySelector('#output-iframe');
 init_sandbox(iframe);
 
 /* Helper functions */
@@ -82,82 +82,47 @@ function render(iframe, code) {
 	var result = {};
 
 	switch (_toolbar.currentLanguage) {
-	case "javascript":
+	case 'javascript':
 		result.compiledCode = code;
-		result.returnValue = w.eval(result.compiledCode); // TODO move to end
+		result.returnValue = w.eval(result.compiledCode);
 		break;
-	case "ruby":
+	case 'ruby':
 		result.compiledCode = w.Opal.compile(code);
-		result.returnValue = w.eval(result.compiledCode); // TODO move to end
+		result.returnValue = w.eval(result.compiledCode);
 		break;
-	case "python":
-		w.Sk.pre = "output";
-		w.Sk.configure({output: function(text) { console.log(text); }, read: function() {
-			if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
-				throw "File not found: '" + x + "'";
-			return Sk.builtinFiles["files"][x];
-		}});
-		// (w.Sk.TurtleGraphics || (w.Sk.TurtleGraphics = {})).target = 'mycanvas';
+	case 'python':
 		var myPromise = w.Sk.misceval.asyncToPromise(function() {
-			return w.Sk.importMainWithBody("<stdin>", false, code, true);
+			return w.Sk.importMainWithBody('<stdin>', false, code, true);
 		});
 		myPromise.then(function(mod) {
-			console.log('success');
+			result.compiledCode = mod.$js;
+			result.returnValue = mod.$d;
 		}, function(err) {
-			console.log(err.toString());
+			console.err(err.toString());
 		});
+		break;
 	}
 
-	console.log("Executing code", result);
+	console.log('Executing code', result);
 }
 
 function init_sandbox(iframe) {
 	// Probably should make sure there are no memory leaks or anything...
 
 	// Inject some HTML into the iframe
-	var html =
-		'<!doctype html>\n' +
-		'<html>\n' +
-		'<head>\n\t\t' +
-			'<meta charset="utf-8"/>\n\t' +
-			'<title>Sandbox</title>\n' +
-			'<link rel="stylesheet" href="./resources/iframe-style.css"/>\n' +
-
-			'<!--p5.js-->\n' +
-			'<script language="javascript" src="./resources/p5.min.js"></script>\n' +
-
-			// '<script src="./resources/p5.gibber.min.js" type="text/javascript" charset="utf-8"></script>\n' +
-			// '<script> function setup() { window["setup1"](); } function draw() { window["draw1"](); } </script>\n' +
-			// '<script> var setup1 = function(){}; var draw1 = function(){}; </script>\n' +
-
-			// TODO load opal asynchronously to not slow down page loading time
-			'<!--Opal-->\n' +
-			'<script type="text/javascript" src="./resources/opal.js"></script>\n' +
-			'<script type="text/javascript" src="./resources/opal-parser.js"></script>\n' +
-			'<script type="text/javascript" src="./resources/opal-native.js"></script>\n' +
-			'<script type="text/javascript">Opal.load("opal-parser")</script>\n' +
-			'<script type="text/ruby" src="./src/turtle-opal.rb"></script>\n' +
-
-			'<!--Skulpt-->\n' +
-			'<script type="text/javascript" src="http://www.skulpt.org/static/skulpt.min.js"></script>\n' +
-			'<script type="text/javascript" src="http://www.skulpt.org/static/skulpt-stdlib.js"></script>\n' +
-			'<script type="text/javascript" src="./src/turtle-skulpt.py"></script>\n' +
-
-			'<script type="text/javascript" src="./src/turtle.js"></script>\n' +
-
-		'</head>\n' +
-		'<body>\n' +
-		'</body>\n' +
-		'</html>';
+	// var html = ...
 
 	// Write to iframe
-	iframe.contentDocument.open();
-	iframe.contentDocument.write(html);
-	iframe.contentDocument.close();
+	// iframe.contentDocument.open();
+	// iframe.contentDocument.write(html);
+	// iframe.contentDocument.close();
+	
+	// Load iframe
+	iframe.src = './iframe-sandbox.html';
 
 	// Autorun after a delay (this is so hackish)
 	// TODO replace with an event listener
-	if (urlVars["autorun"]) {
+	if (urlVars['autorun']) {
 		iframe.contentWindow.setTimeout(function() {
 			_editor.selectAll();
 			render(iframe);
@@ -176,22 +141,22 @@ window.setInterval(saveToLocalStorage, 30000);
 /* Event listeners */
 // Save keybinding
 _editor.commands.addCommand({
-    name: "save",
+    name: 'save',
     exec: function() {
 		saveToLocalStorage();
 	},
-    bindKey: {mac: "Cmd-S", win: "Ctrl-S"}
+    bindKey: {mac: 'Cmd-S', win: 'Ctrl-S'}
 })
 
 // Eval keybinding
-// $("body").keydown(function(event) {
-document.body.addEventListener("keydown", function(event) {
+// $('body').keydown(function(event) {
+document.body.addEventListener('keydown', function(event) {
 	// https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
 	window.event = event;
-	var ctrlPressed = event.getModifierState("Control") || event.getModifierState("Meta");
+	var ctrlPressed = event.getModifierState('Control') || event.getModifierState('Meta');
 	var key = event.key;
 
-	if (ctrlPressed && key=="Enter") {
+	if (ctrlPressed && key=='Enter') {
 		evalSelectionOrLine(iframe);
 	}
 });

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Sandbox</title>
+    <link rel="stylesheet" href="./resources/iframe-style.css">
+    <!-- p5.js-->
+    <script type="text/javascript" src="./resources/p5.min.js"></script>
+    <!-- script(type='text/javascript', src="./resources/p5.gibber.min.js")-->
+    <!-- script.function setup() { window["setup1"](); } function draw() { window["draw1"](); }
+    -->
+    <!-- script.
+    var setup1 = function(){}; var draw1 = function(){};
+    
+    -->
+    <!-- TODO load opal asynchronously to not slow down page loading time-->
+    <!-- Opal-->
+    <script type="text/javascript" src="./resources/opal.js"></script>
+    <script type="text/javascript" src="./resources/opal-parser.js"></script>
+    <script type="text/javascript" src="./resources/opal-native.js"></script>
+    <script type="text/javascript">Opal.load("opal-parser")</script>
+    <script type="text/ruby" src="./src/turtle-opal.rb"></script>
+    <!-- Skulpt-->
+    <script type="text/javascript" src="http://www.skulpt.org/static/skulpt.min.js"></script>
+    <script type="text/javascript" src="http://www.skulpt.org/static/skulpt-stdlib.js"></script>
+    <script type="text/python" src="./src/turtle-skulpt.py"></script>
+    <script>
+      // Configure skulpt
+      Sk.pre = 'output';
+      Sk.configure({
+      	output: function(text) { console.log(text); },
+      	read: function(x) {
+      		if (Sk.builtinFiles === undefined || Sk.builtinFiles['files'][x] === undefined) {
+      			throw "File not found: '" + x + "'"; }
+      		return Sk.builtinFiles['files'][x];
+      	}
+      });
+      // (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+      
+    </script>
+    <!-- Turtle-->
+    <script type="text/javascript" src="./src/turtle.js"></script>
+  </head>
+  <body></body>
+</html>
