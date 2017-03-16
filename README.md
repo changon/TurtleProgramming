@@ -111,6 +111,7 @@ Python turtle: https://docs.python.org/2/library/turtle.html
 https://michael0x2a.com/blog/turtle-examples
 https://github.com/peterc/trtl/tree/master/examples
 http://leahbuechley.com/Turtle/index.html
+https://www.turtle.ox.ac.uk/online/ (basic, pascal, and python. has really good examples)
 
 TurtleScript?  https://github.com/cscott/TurtleScript
 

@@ -41,10 +41,17 @@ var Turtle = function() {
 };
 
 Turtle.prototype._addCommand = function(cmd, args) {
+	var resolve, reject;
+	var p = new Promise(function(_resolve, _reject) {
+		resolve = _resolve;
+		reject = _reject;
+	});
 	// Add command to end of queue (beginning of array)
-	this._commandQueue.unshift([cmd, args]);
+	this._commandQueue.unshift([cmd, args, resolve, reject]);
+	return p;
 };
 
+// TODO add promises
 Turtle.prototype._addCommand_ = function(cmd, args) {
 	// If command is not finished, pop from the queue
 	// and make it appear that it reached its destination
@@ -175,45 +182,45 @@ Turtle.prototype._mergeClones = function() {
 
 /* Turtle commands */
 // Move and draw
-Turtle.prototype.forward = function (n) { this._addCommand('forward', n); };
-Turtle.prototype.backward = function (n) { this._addCommand('backward', n); };
-Turtle.prototype.right = function (n) { this._addCommand('right', n); };
-Turtle.prototype.left = function (n) { this._addCommand('left', n); };
-Turtle.prototype.setxy = function(x, y) { this._addCommand('setxy', [x, y]); }
-Turtle.prototype.setheading = function(ang) { this._addCommand('setheading', ang); }
-Turtle.prototype.write = function(str) { this._addCommand('write', str); }
+Turtle.prototype.forward = function (n) { return this._addCommand('forward', n); };
+Turtle.prototype.backward = function (n) { return this._addCommand('backward', n); };
+Turtle.prototype.right = function (n) { return this._addCommand('right', n); };
+Turtle.prototype.left = function (n) { return this._addCommand('left', n); };
+Turtle.prototype.setxy = function(x, y) { return this._addCommand('setxy', [x, y]); }
+Turtle.prototype.setheading = function(ang) { return this._addCommand('setheading', ang); }
+Turtle.prototype.write = function(str) { return this._addCommand('write', str); }
 
-Turtle.prototype.push = function () { this._addCommand('push'); };
-Turtle.prototype.pop = function () { this._addCommand('pop'); };
+Turtle.prototype.push = function () { return this._addCommand('push'); };
+Turtle.prototype.pop = function () { return this._addCommand('pop'); };
 
 // Drawing state
-Turtle.prototype.show = function() { this._addCommand('show'); }
-Turtle.prototype.hide = function() { this._addCommand('hide'); }
-Turtle.prototype.clear = function() { this._addCommand('clear'); }
-Turtle.prototype.pendown = function() { this._addCommand('pendown'); }
-Turtle.prototype.penup = function() { this._addCommand('penup'); }
-Turtle.prototype.color = function(...args) { this._addCommand('color', args); }
-Turtle.prototype.width = function(n) { this._addCommand('width', n); }
+Turtle.prototype.show = function() { return this._addCommand('show'); }
+Turtle.prototype.hide = function() { return this._addCommand('hide'); }
+Turtle.prototype.clear = function() { return this._addCommand('clear'); }
+Turtle.prototype.pendown = function() { return this._addCommand('pendown'); }
+Turtle.prototype.penup = function() { return this._addCommand('penup'); }
+Turtle.prototype.color = function(...args) { return this._addCommand('color', args); }
+Turtle.prototype.width = function(n) { return this._addCommand('width', n); }
 
-Turtle.prototype.reset = function() { this._addCommand('reset'); }
+Turtle.prototype.reset = function() { return this._addCommand('reset'); }
 
 // Cloning
-Turtle.prototype.clone = function() { this._addCommand('clone'); }
-Turtle.prototype.killClones = function() { this._addCommand('killClones'); }
-Turtle.prototype.mergeClones = function() { this._addCommand('mergeClones'); }
+Turtle.prototype.clone = function() { return this._addCommand('clone'); }
+Turtle.prototype.killClones = function() { return this._addCommand('killClones'); }
+Turtle.prototype.mergeClones = function() { return this._addCommand('mergeClones'); }
 
 // Urgent commands
-Turtle.prototype['show!'] = function() { this._addCommand_('show'); }
-Turtle.prototype['hide!'] = function() { this._addCommand_('hide'); }
-Turtle.prototype['clear!'] = function() { this._addCommand_('clear'); }
-Turtle.prototype['pendown!'] = function() { this._addCommand_('pendown'); }
-Turtle.prototype['penup!'] = function() { this._addCommand_('penup'); }
-Turtle.prototype['reset!'] = function() { this._addCommand_('reset'); }
-Turtle.prototype['setxy!'] = function(x, y) { this._addCommand_('setxy', [x, y]); }
-Turtle.prototype['setheading!'] = function(x, y) { this._addCommand_('setheading', [x, y]); }
+Turtle.prototype['show!'] = function() { return this._addCommand_('show'); }
+Turtle.prototype['hide!'] = function() { return this._addCommand_('hide'); }
+Turtle.prototype['clear!'] = function() { return this._addCommand_('clear'); }
+Turtle.prototype['pendown!'] = function() { return this._addCommand_('pendown'); }
+Turtle.prototype['penup!'] = function() { return this._addCommand_('penup'); }
+Turtle.prototype['reset!'] = function() { return this._addCommand_('reset'); }
+Turtle.prototype['setxy!'] = function(x, y) { return this._addCommand_('setxy', [x, y]); }
+Turtle.prototype['setheading!'] = function(x, y) { return this._addCommand_('setheading', [x, y]); }
 
-Turtle.prototype['stop!'] = function() { this._addCommand_('stop'); }
-Turtle.prototype['killClones!'] = function() { this._addCommand_('killClones'); }
+Turtle.prototype['stop!'] = function() { return this._addCommand_('stop'); }
+Turtle.prototype['killClones!'] = function() { return this._addCommand_('killClones'); }
 
 // Aliases
 Turtle.prototype.fd = Turtle.prototype.forward;
@@ -350,81 +357,101 @@ Turtle.prototype.executeNextCommand = function() {
 	var command = this._commandQueue.pop();
 	if (command) {
 		this._commandFinished = false;
-		var cmd = command[0];
-		var args = command[1];
+		// TODO remove
+		// var cmd = command[0];
+		// var args = command[1];
+		// var resolve = command[2];
+		// var reject = command[3];
+		var [ cmd, args, resolve, reject ] = command;
 		switch (cmd) {
 			case 'forward':
 				logText('Forward ' + args);
 				this._x_new = this._x + args * Math.cos(radians(this._ang));
 				this._y_new = this._y + args * Math.sin(radians(this._ang));
 				this._addVertex();
+				resolve();
 				break;
 			case 'backward':
 				logText('Backward ' + args);
 				this._x_new = this._x - args * Math.cos(radians(this._ang));
 				this._y_new = this._y - args * Math.sin(radians(this._ang));
 				this._addVertex();
+				resolve();
 				break;
 			case 'right':
 				logText('Right ' + args);
 				this._ang_new = (this._ang - args);
+				resolve();
 				break;
 			case 'left':
 				logText('Left ' + args);
 				this._ang_new = (this._ang + args);
+				resolve();
 				break;
 			case 'setxy':
 				logText('Set [x, y] to ' + args);
 				this._x_new = args[0];
 				this._y_new = args[1];
 				this._addVoid();
+				resolve();
 				break;
 			case 'setheading':
 				logText('Set heading to ' + args);
 				this._ang_new = args;
+				resolve();
 				break;
 			case 'hide':
 				logText('Hide');
 				this._isVisible = false;
+				resolve();
 				break;
 			case 'show':
 				logText('Show');
 				this._isVisible = true;
+				resolve();
 				break;
 			case 'clear':
 				logText('Clear');
 				this._vertices.length = 0;
+				resolve();
 				break;
 			case 'write':
 				logText('Write "' + args + '"');
 				this._addText(args);
+				resolve();
 				break;
 			case 'push':
 				logText('Saving state');
 				this._pushState();
 				this._addVoid();
+				resolve();
 				break;
 			case 'pop':
 				logText('Restoring state');
 				this._popState();
 				this._addVoid();
+				resolve();
 				break;
 			case 'pendown':
 				logText('Pen down');
 				this._isPenDown = true;
+				resolve();
 				break;
 			case 'penup':
 				logText('Pen up');
 				this._isPenDown = false;
 				this._addVoid();
+				resolve();
 				break;
 			case 'color':
 				logText('Set color to ' + args);
 				this._color = color(...args); // wrap using p5.Color
+				resolve();
 				break;
 			case 'width':
 				logText('Set width to ' + args);
 				this._width = args;
+				resolve();
 				break;
 			case 'reset':
 				logText('Reset');
@@ -434,6 +461,7 @@ Turtle.prototype.executeNextCommand = function() {
 				this._ang = this._ang_new = 90;
 				this._x = this._y = 0;
 				this._x_new = this._y_new = 0;
+				resolve();
 				break;
 			case 'stop':
 				logText('Stop');
@@ -441,21 +469,25 @@ Turtle.prototype.executeNextCommand = function() {
 				// Reset command queue
 				// Why doesn't this work? this._commandQueue.length = 0;
 				while (this._commandQueue.length > 0) { this._commandQueue.pop(); }
+				resolve();
 				break;
 
 			case 'clone':
 				logText('Clone');
-				this._clone();
+				var clone = this._clone();
+				resolve(clone);
 				break;
 
 			case 'killClones':
 				logText('Kill clones');
 				this._killClones();
+				resolve();
 				break;
 
 			case 'mergeClones':
 				logText('Merge clones');
 				this._mergeClones();
+				resolve();
 				break;
 		}
 	}
