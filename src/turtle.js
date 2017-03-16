@@ -1,5 +1,17 @@
 'use strict';
 
+var PromiseWrapper = function(promise) {
+	// TODO wrap in a Proxy?
+	// Wrap promise in a plain object, with the result attached
+	this.promise = promise;
+	this.value = undefined;
+	this.valueOf = () => this.value;
+	promise.then((result) => {
+		this.value = result;
+	});
+};
+
+
 /* class Turtle */
 /*
  * Coordinates follow the Cartesian convention (right-hand rule?):
@@ -41,18 +53,21 @@ var Turtle = function() {
 };
 
 Turtle.prototype._addCommand = function(cmd, args) {
+	// Create a promise, and resolve/reject it in _executeNextCommand()
 	var resolve, reject;
-	var p = new Promise(function(_resolve, _reject) {
-		resolve = _resolve;
-		reject = _reject;
-	});
+	var p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
 	// Add command to end of queue (beginning of array)
 	this._commandQueue.unshift([cmd, args, resolve, reject]);
-	return p;
+	// Return wrapped promise
+	return new PromiseWrapper(p);
 };
 
 // TODO add promises
 Turtle.prototype._addCommand_ = function(cmd, args) {
+	// Create a promise, and resolve/reject it in _executeNextCommand()
+	var resolve, reject;
+	var p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
+
 	// If command is not finished, pop from the queue
 	// and make it appear that it reached its destination
 	if (!this._commandFinished) {
@@ -74,7 +89,9 @@ Turtle.prototype._addCommand_ = function(cmd, args) {
 	}
 
 	// Add command to front of queue (end of array)
-	this._commandQueue.push([cmd, args]);
+	this._commandQueue.push([cmd, args, resolve, reject]);
+	// Return promise
+	return p;
 };
 
 Turtle.prototype._addVertex = function() {
@@ -150,7 +167,7 @@ Turtle.prototype._clone = function() {
 }
 
 // Get a list containing itself, its clones, and their clones recursively
-Turtle.prototype.all = function() {
+Turtle.prototype._all = function() {
 	// Base case: no clones
 	if (this._clones.length == 0) {
 		return [ this ];
@@ -159,7 +176,7 @@ Turtle.prototype.all = function() {
 	else {
 		var flattened = [ this ];
 		this._clones.forEach(function(clone, i) {
-			flattened = flattened.concat(clone.all());
+			flattened = flattened.concat(clone._all());
 		});
 		return flattened;
 	}
@@ -173,7 +190,7 @@ Turtle.prototype._killClones = function() {
 
 // Recursively merge clones' vertices, and kill the clones
 Turtle.prototype._mergeClones = function() {
-	var all = this.all();
+	var all = this._all();
 	// TODO: add void vertex between the different clones
 	var vertices = all.map((clone) => clone._vertices).reduce((a,b) => a.concat(b));
 	this._vertices = vertices;
@@ -199,8 +216,8 @@ Turtle.prototype.hide = function() { return this._addCommand('hide'); }
 Turtle.prototype.clear = function() { return this._addCommand('clear'); }
 Turtle.prototype.pendown = function() { return this._addCommand('pendown'); }
 Turtle.prototype.penup = function() { return this._addCommand('penup'); }
-Turtle.prototype.color = function(...args) { return this._addCommand('color', args); }
-Turtle.prototype.width = function(n) { return this._addCommand('width', n); }
+Turtle.prototype.color = function(...args) { return this._addCommand('setcolor', args); }
+Turtle.prototype.width = function(n) { return this._addCommand('setwidth', n); }
 
 Turtle.prototype.reset = function() { return this._addCommand('reset'); }
 
@@ -236,10 +253,20 @@ Turtle.prototype['goto!'] = Turtle.prototype['setxy!'];
 Turtle.prototype['seth!'] = Turtle.prototype['setheading!'];
 
 // isX -> x?
-Object.defineProperty(Turtle.prototype, 'pendown?', { get: function() { return this._isPenDown; }, })
-Object.defineProperty(Turtle.prototype, 'visible?', { get: function() { return this._isVisible; }, })
+Object.defineProperty(Turtle.prototype, 'pendown?', { get: function() { return this.isPenDown; } });
+Object.defineProperty(Turtle.prototype, 'visible?', { get: function() { return this.isVisible; } });
 
-// TODO: stop, color
+// Getters
+// TODO define dynamically?
+// TODO make set call the respective set command?
+Object.defineProperty(Turtle.prototype, 'x', { get: function() { return this._addCommand('getx'); } });
+Object.defineProperty(Turtle.prototype, 'y', { get: function() { return this._addCommand('gety'); } });
+Object.defineProperty(Turtle.prototype, 'ang', { get: function() { return this._addCommand('getheading'); } });
+Object.defineProperty(Turtle.prototype, 'color', { get: function() { return this._addCommand('getcolor'); } });
+Object.defineProperty(Turtle.prototype, 'width', { get: function() { return this._addCommand('getwidth'); } });
+Object.defineProperty(Turtle.prototype, 'isPenDown', { get: function() { return this._addCommand('getIsPenDown'); } });
+Object.defineProperty(Turtle.prototype, 'isVisible', { get: function() { return this._addCommand('getVisible'); } });
+
 // TODO: commandHistory, undo
 
 Turtle.prototype._update = function() {
@@ -255,7 +282,7 @@ Turtle.prototype._update = function() {
 			this._ang = this._ang_new;
 
 			this._commandFinished = true;
-			this.executeNextCommand();
+			this._executeNextCommand();
 		}
 		// Otherwise move towards new position
 		else {
@@ -275,7 +302,7 @@ Turtle.prototype._update = function() {
 	else {
 		// var n = this._commandQueue.length * this._scale; // while (n--)
 		while (this._commandQueue.length > 0) {
-			this.executeNextCommand();
+			this._executeNextCommand();
 			this._x = this._x_new;
 			this._y = this._y_new;
 			this._ang = this._ang_new;
@@ -352,41 +379,55 @@ Turtle.prototype._draw = function() {
 	})
 };
 
-Turtle.prototype.executeNextCommand = function() {
+Turtle.prototype._executeNextCommand = function() {
 	// Get next command in command queue
 	var command = this._commandQueue.pop();
 	if (command) {
 		this._commandFinished = false;
-		// TODO remove
-		// var cmd = command[0];
-		// var args = command[1];
-		// var resolve = command[2];
-		// var reject = command[3];
 		var [ cmd, args, resolve, reject ] = command;
+
+		// Unwrap promise
+		// This is essentially lazy evaluation
+		if (typeof args === 'object' && args instanceof PromiseWrapper) {
+			args = args.valueOf();
+		}
+
 		switch (cmd) {
 			case 'forward':
-				logText('Forward ' + args);
-				this._x_new = this._x + args * Math.cos(radians(this._ang));
-				this._y_new = this._y + args * Math.sin(radians(this._ang));
-				this._addVertex();
-				resolve();
+				if (typeof args !== 'number') { reject(); }
+				else {
+					logText('Forward ' + args);
+					this._x_new = this._x + args * Math.cos(radians(this._ang));
+					this._y_new = this._y + args * Math.sin(radians(this._ang));
+					this._addVertex();
+					resolve();
+				}
 				break;
 			case 'backward':
-				logText('Backward ' + args);
-				this._x_new = this._x - args * Math.cos(radians(this._ang));
-				this._y_new = this._y - args * Math.sin(radians(this._ang));
-				this._addVertex();
-				resolve();
+				if (typeof args !== 'number') { reject(); }
+				else {
+					logText('Backward ' + args);
+					this._x_new = this._x - args * Math.cos(radians(this._ang));
+					this._y_new = this._y - args * Math.sin(radians(this._ang));
+					this._addVertex();
+					resolve();
+				}
 				break;
 			case 'right':
-				logText('Right ' + args);
-				this._ang_new = (this._ang - args);
-				resolve();
+				if (typeof args !== 'number') { reject(); }
+				else {
+					logText('Right ' + args);
+					this._ang_new = (this._ang - args);
+					resolve();
+				}
 				break;
 			case 'left':
-				logText('Left ' + args);
-				this._ang_new = (this._ang + args);
-				resolve();
+				if (typeof args !== 'number') { reject(); }
+				else {
+					logText('Left ' + args);
+					this._ang_new = (this._ang + args);
+					resolve();
+				}
 				break;
 			case 'setxy':
 				logText('Set [x, y] to ' + args);
@@ -443,12 +484,12 @@ Turtle.prototype.executeNextCommand = function() {
 				this._addVoid();
 				resolve();
 				break;
-			case 'color':
+			case 'setcolor':
 				logText('Set color to ' + args);
 				this._color = color(...args); // wrap using p5.Color
 				resolve();
 				break;
-			case 'width':
+			case 'setwidth':
 				logText('Set width to ' + args);
 				this._width = args;
 				resolve();
@@ -472,6 +513,7 @@ Turtle.prototype.executeNextCommand = function() {
 				resolve();
 				break;
 
+			// Cloning
 			case 'clone':
 				logText('Clone');
 				var clone = this._clone();
@@ -488,6 +530,24 @@ Turtle.prototype.executeNextCommand = function() {
 				logText('Merge clones');
 				this._mergeClones();
 				resolve();
+				break;
+
+			// Getters
+			// TODO: cleanup
+			// clones, color, width, parent
+			case 'getx': resolve(this._x); break;
+			case 'gety': resolve(this._y); break;
+			case 'getxy': resolve([this._x, this._y]); break;
+			case 'getheading': resolve(this._ang); break;
+			case 'getcolor': resolve(this._color); break;
+			case 'getwidth': resolve(this._width); break;
+			case 'getIsPenDown': resolve(this._isPenDown); break;
+			case 'getIsVisible': resolve(this._isVisible); break;
+
+			case 'call':
+				// Function is passed as an argument
+				var fn = args;
+				resolve(fn());
 				break;
 		}
 	}
@@ -518,7 +578,7 @@ var cloneProxy = new Proxy({}, {
 	get: (target, key) => {
 		// Output a function
 		return (...args) => {
-			var all = t.all();
+			var all = t._all();
 			// Proxy the function call to each clone
 			return all.map((clone) => {
 				var prop = clone[key];
