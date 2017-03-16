@@ -45,7 +45,9 @@ http://localhost:8080/?program=clones&language=ruby
 
 ## Known caveats and bugs
 - When using Ruby, globals are not retained
+- Also for Ruby, the Opal workaround is required for some browsers
 - After upgrading to p5.js 0.5.7, holding the key down does not trigger repeated calls of keyTyped()
+- Language does not change after selecting from the program list
 
 ## To Program
 - bulid reference side bar
