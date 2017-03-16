@@ -9,6 +9,12 @@ var PromiseWrapper = function(promise) {
 	promise.then((result) => {
 		this.value = result;
 	});
+
+	// TODO proxy function calls
+	this.add = (arg) => new PromiseWrapper(promise.then((val) => (val + arg)));
+	this.sub = (arg) => new PromiseWrapper(promise.then((val) => (val - arg)));
+	this.mul = (arg) => new PromiseWrapper(promise.then((val) => (val * arg)));
+	this.div = (arg) => new PromiseWrapper(promise.then((val) => (val / arg)));
 };
 
 
@@ -90,8 +96,8 @@ Turtle.prototype._addCommand_ = function(cmd, args) {
 
 	// Add command to front of queue (end of array)
 	this._commandQueue.push([cmd, args, resolve, reject]);
-	// Return promise
-	return p;
+	// Return wrapped promise
+	return new PromiseWrapper(p);
 };
 
 Turtle.prototype._addVertex = function() {
@@ -386,10 +392,15 @@ Turtle.prototype._executeNextCommand = function() {
 		this._commandFinished = false;
 		var [ cmd, args, resolve, reject ] = command;
 
-		// Unwrap promise
-		// This is essentially lazy evaluation
+		// Unwrap promise and pass it on to the next if statement
 		if (typeof args === 'object' && args instanceof PromiseWrapper) {
-			args = args.valueOf();
+			args = args.valueOf;
+		}
+
+		// Unwrap function
+		// This is essentially lazy evaluation
+		if (typeof args === 'function') {
+			args = args();
 		}
 
 		switch (cmd) {

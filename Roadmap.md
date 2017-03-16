@@ -4,6 +4,7 @@
   - Angular
 
 - [ ] Manage dependencies:
+  - RequireJS?
   - Webpack?
   - Bower?
 

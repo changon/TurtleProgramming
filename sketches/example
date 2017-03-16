@@ -25,4 +25,14 @@ end
 
 square()
 
- # To make a square with length s
+# To make a square with length s
+# ...
+
+
+
+t.reset()
+t.setxy(0,-200)
+5.times do
+    t.forward(50)
+    t.write(t.x)
+end
