@@ -39,3 +39,5 @@
   - Properties such as `t.x`, `t.y`, `t.ang` are now defined as properties that return a PromiseWrapper, which wraps the Promise returned by ``_addCommand()` and whose `valueOf` method returns the value of the property the time of the call. In `_executeNextCommand`, the promise wrapper gets unwrapped. Statements like  `for(var i = 0; i < 5; i++) { t.write(t.x); t.forward(50) }` now work as expected.
 - Added lazy evaluation for functions passed to  `_executeNextCommand`. [13:21]
   - This makes it easier to pass in functions as arguments, so you can write `for(var i = 0; i < 5; i++) { t.write(() => Math.random() * 100); t.forward(50) }`. `_executeNextCommand` now uses the `valueOf` function of a `PromiseWrapper`.
+- Added call function for PromiseWrapper.
+  - You can now do this: `a = t.clone(); a.call((x) => { x.forward(100); x.right(90); })`

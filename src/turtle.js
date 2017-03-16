@@ -11,6 +11,12 @@ var PromiseWrapper = function(promise) {
 	});
 
 	// TODO proxy function calls
+
+	// Calls fn on the wrapped value
+	this.call = (fn) => new PromiseWrapper(promise.then((val) => {
+		return fn(val);
+	}));
+
 	this.add = (arg) => new PromiseWrapper(promise.then((val) => (val + arg)));
 	this.sub = (arg) => new PromiseWrapper(promise.then((val) => (val - arg)));
 	this.mul = (arg) => new PromiseWrapper(promise.then((val) => (val * arg)));
