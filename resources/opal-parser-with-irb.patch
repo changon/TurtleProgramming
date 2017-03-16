@@ -1,0 +1,11 @@
+--- opal-parser.js	2017-03-16 18:14:36.000000000 -0400
++++ opal-parser-with-irb.js	2017-03-16 18:14:45.000000000 -0400
+@@ -13650,7 +13650,7 @@
+ 
+       self.$compiler_option("tainting", true, $hash2(["as"], {"as": "tainting?"}));
+ 
+-      self.$compiler_option("irb", false, $hash2(["as"], {"as": "irb?"}));
++      self.$compiler_option("irb", true, $hash2(["as"], {"as": "irb?"}));
+ 
+       self.$compiler_option("dynamic_require_severity", "warning", $hash2(["valid_values"], {"valid_values": ["error", "warning", "ignore"]}));
+ 

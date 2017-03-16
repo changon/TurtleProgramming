@@ -20,7 +20,7 @@
 ## 3/15
 - Improved python support.
   - Globals are now retained, by setting `retainglobals` to `true` in `Sk.configure`. I found this undocumented from the source for the Skulpt REPL, which seemed to do what I want.
-  - [ ] TODO: look into opal-repl
+  - [x] DONE: look into opal-irb
 - Added basic snippet support. It seems like RequireJS is needed to register custom snippets.
   - [ ] TODO: set up RequireJS.
 - Added CoffeeScript support.
@@ -41,3 +41,5 @@
   - This makes it easier to pass in functions as arguments, so you can write `for(var i = 0; i < 5; i++) { t.write(() => Math.random() * 100); t.forward(50) }`. `_executeNextCommand` now uses the `valueOf` function of a `PromiseWrapper`.
 - Added call function for PromiseWrapper.
   - You can now do this: `a = t.clone(); a.call((x) => { x.forward(100); x.right(90); })`
+- Enabled irb mode for Opal. [18:17]
+  - This allows local variables on main to be retained. I had to dig through the source for opal-irb, and it took me almost an hour to find that 'irb?' was a compiler option.

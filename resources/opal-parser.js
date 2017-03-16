@@ -13650,7 +13650,7 @@ Opal.modules["opal/compiler"] = function(Opal) {
 
       self.$compiler_option("tainting", true, $hash2(["as"], {"as": "tainting?"}));
 
-      self.$compiler_option("irb", false, $hash2(["as"], {"as": "irb?"}));
+      self.$compiler_option("irb", true, $hash2(["as"], {"as": "irb?"}));
 
       self.$compiler_option("dynamic_require_severity", "warning", $hash2(["valid_values"], {"valid_values": ["error", "warning", "ignore"]}));
 
