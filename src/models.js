@@ -56,8 +56,8 @@ var commandCatalog = [
 ];
 
 var programList = [
-	{ name: 'Guess a Number', fileName: 'koch-snowflake', language: 'ruby' },
-	{ name: 'Koch snowflake', fileName: 'guess-a-number', language: 'coffee' },
+	{ name: 'Guess a Number', fileName: 'guess-a-number', language: 'coffee' },
+	{ name: 'Koch snowflake', fileName: 'koch-snowflake', language: 'ruby' },
 	{ name: 'B1A4 Good Timing', fileName: 'b1a4-good-timing', language: 'ruby', autorun: true },
 	{ name: 'Spiral', fileName: 'spiral', language: 'ruby' },
 	{ name: 'Clones', fileName: 'clones', language: 'ruby' },

@@ -1,0 +1,28 @@
+# Draw a square
+t.forward(100) # Draw a straight line
+t.right(90) # Turn right 90 degrees
+t.forward(100) # Repeat 3 more times
+t.right(90)
+t.forward(100)
+t.right(90)
+t.forward(100)
+t.right(90)
+
+# That was kind of repetitive, so let's wrap it in a loop:
+4.times do # Repeat the following statements 4 times:
+    t.forward(90) # Turn right 90 degrees
+    t.right(90) # Draw a straight line
+end
+
+# What if we wanted to 
+# Now make it into a method
+def square()
+    4.times do
+        t.forward(100)
+        t.right(90)
+    end
+end
+
+square()
+
+ # To make a square with length s
