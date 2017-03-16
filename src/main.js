@@ -77,7 +77,8 @@ var _toolbar = new Vue({
 	data: {
 		supportedLanguages: supportedLanguages,
 		currentLanguage: defaultLanguage,
-		programCatalog: programCatalog,
+		commandCatalog: commandCatalog,
+		programList: programList
 	},
 	computed: {
 		t: function() {
@@ -96,6 +97,19 @@ var _toolbar = new Vue({
 			// just strip out the dollar signs
 			var sanitized = code.split(/\$[0-9]/).join('');
 			_editor.insert(sanitized);
+		},
+		loadSketch: function(sketch) {
+			var url = './sketches/' + sketch.fileName;
+			readFileFromURL(url);
+			if (sketch.language) {
+				this.currentLanguage = sketch.language;
+				this.updateLanguage();
+			}
+			if (sketch.autorun) {
+				evalAll();
+				console.log('Autorunning');
+			}
+			console.log('Load sketch ' + sketch.name + ' from ' + url);
 		}
 	},
 	// TODO this should be wrapped in vm for ace, and run after ace loads
@@ -115,6 +129,7 @@ var _toolbar = new Vue({
 			readFromLocalStorage();
 		}
 
+		// TODO: merge with loadSketch()
 		// If a language is specified, check to make sure
 		// it is supported, and load it
 		var language = urlVars['language'];
@@ -125,6 +140,7 @@ var _toolbar = new Vue({
 
 		this.updateLanguage();
 
+		// TODO: merge with loadSketch()
 		// Autorun after a delay (this is so hackish)
 		// TODO replace with an event listener
 		if (urlVars['autorun']) {

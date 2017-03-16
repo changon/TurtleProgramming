@@ -35,15 +35,23 @@
             <option v-for="(lang, langVal) in supportedLanguages" :value="langVal">{{ lang }}</option>
           </select>
           <!-- }-->
-          <!-- Program catalog-->
-          <!-- TODO use a v-for, dynamically bind, depend on language--><span class="dropdown">
-            <button class="btn btn-default dropdown-toggle" id="program-catalog" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Program catalog <span class="caret"></span></button>
-            <ul class="dropdown-menu" aria-labelledby="program-catalog">
-              <template v-for="group in programCatalog">
+          <!-- Command catalog-->
+          <!-- TODO use snippets--><span class="dropdown">
+            <button class="btn btn-default dropdown-toggle" id="command-catalog" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Command catalog <span class="caret"></span></button>
+            <ul class="dropdown-menu" aria-labelledby="command-catalog">
+              <template v-for="group in commandCatalog">
                 <li class="dropdown-header">{{ group.category }}</li>
                 <template v-for="command in group.commands">
                   <li><a href="#" @click="insertCode(command.expand)">{{ command.name }}</a></li>
                 </template>
+                <li class="divider" role="separator"></li>
+              </template>
+            </ul></span>
+          <!-- Program list--><span class="dropdown">
+            <button class="btn btn-default dropdown-toggle" id="program-list" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Program list <span class="caret"></span></button>
+            <ul class="dropdown-menu" aria-labelledby="program-list">
+              <template v-for="program in programList">
+                <li><a href="#" @click="loadSketch(program)">{{ program.name }}</a></li>
                 <li class="divider" role="separator"></li>
               </template>
             </ul></span>

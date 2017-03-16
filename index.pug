@@ -48,23 +48,39 @@ html
 						option(v-for='(lang, langVal) in supportedLanguages', :value='langVal') {{ lang }}
 					// }
 
-					// Program catalog
-					// TODO use a v-for, dynamically bind, depend on language
+					// Command catalog
+					// TODO use snippets
 					span.dropdown
-						button#program-catalog.btn.btn-default.dropdown-toggle(
+						button#command-catalog.btn.btn-default.dropdown-toggle(
 							type='button',
 							data-toggle='dropdown',
 							aria-haspopup='true',
 							aria-expanded='false'
-						) Program catalog #[span.caret]
-						ul.dropdown-menu(aria-labelledby='program-catalog')
-							template(v-for='group in programCatalog')
+						) Command catalog #[span.caret]
+						ul.dropdown-menu(aria-labelledby='command-catalog')
+							template(v-for='group in commandCatalog')
 								li.dropdown-header {{ group.category }}
 								template(v-for='command in group.commands')
 									li: a(href='#',
 										@click='insertCode(command.expand)'
 									)
 										| {{ command.name }}
+								li.divider(role='separator')
+
+					// Program list
+					span.dropdown
+						button#program-list.btn.btn-default.dropdown-toggle(
+							type='button',
+							data-toggle='dropdown',
+							aria-haspopup='true',
+							aria-expanded='false'
+						) Program list #[span.caret]
+						ul.dropdown-menu(aria-labelledby='program-list')
+							template(v-for='program in programList')
+								li: a(href='#',
+									@click='loadSketch(program)'
+								)
+										| {{ program.name }}
 								li.divider(role='separator')
 
 

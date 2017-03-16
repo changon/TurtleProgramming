@@ -25,8 +25,8 @@ function repeat(n, fn) {
 
 // Generates a random integer
 // Uses p5js's `random` function
-function randomInt(n) {
-	return Math.floor(random(n));
+function randomInt(a, b) {
+	return Math.floor(random(a, b));
 }
 
 // Prompts with a message and an optional default value
