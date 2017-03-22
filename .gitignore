@@ -1,7 +1,15 @@
 .DS_Store
 .*.swp
 
-node_modules
+# Logs
+logs
+*.log
+npm-debug.log*
 
+# Node
+node_modules
+bower_components
+
+# Sass
 .sass-cache
 *.css.map

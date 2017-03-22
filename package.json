@@ -12,7 +12,9 @@
   },
   "homepage": "https://github.com/changon/TurtleProgramming#readme",
   "devDependencies": {
+    "babel-preset-env": "^1.2.2",
     "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
     "gulp-pug": "^3.3.0",
     "gulp-server-livereload": "^1.9.2"
   },

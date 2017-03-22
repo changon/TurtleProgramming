@@ -1,3 +1,5 @@
+'use strict';
+
 // Get contents stored in localStorage
 // TODO use jquery?
 function readFromLocalStorage() {

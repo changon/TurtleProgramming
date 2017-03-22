@@ -1,7 +1,6 @@
 require 'native'
 
-$t = Native(`t`)
-def t(); return $t; end
+t = Native(`t`)
 
 # Misc.
 def logText(str); `logText(#{str})`; end

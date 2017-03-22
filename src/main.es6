@@ -1,5 +1,3 @@
-'use strict';
-
 /* RequireJS config */
 // https://github.com/ajaxorg/ace/issues/1017
 /*
@@ -45,7 +43,7 @@ _editor.getSession().setOptions({
 
 /* Window event listeners */
 // Resize listener
-window.addEventListener('resize', function () {
+window.addEventListener('resize', function() {
 	_editor.resize();
 	// TODO: resize p5 canvas as well
 });
@@ -53,20 +51,20 @@ window.addEventListener('resize', function () {
 /* Keybindings */
 // Save keybinding
 _editor.commands.addCommand({
-	name: 'save',
-	exec: function exec() {
+    name: 'save',
+    exec: function() {
 		saveToLocalStorage();
 	},
-	bindKey: { mac: 'Cmd-S', win: 'Ctrl-S' }
+    bindKey: { mac: 'Cmd-S', win: 'Ctrl-S' }
 });
 
 // Eval keybinding
 _editor.commands.addCommand({
-	name: 'eval',
-	exec: function exec() {
+    name: 'eval',
+    exec: function() {
 		evalSelectionOrLine(iframe);
 	},
-	bindKey: { mac: 'Cmd-Enter', win: 'Ctrl-Enter' }
+    bindKey: { mac: 'Cmd-Enter', win: 'Ctrl-Enter' }
 });
 
 // Load iframe
@@ -83,24 +81,24 @@ var _toolbar = new Vue({
 		programList: programList
 	},
 	computed: {
-		t: function t() {
+		t: function() {
 			// return iframe.contentWindow.t;
 			return iframe.contentWindow.proxy;
 		}
 	},
 	methods: {
-		updateLanguage: function updateLanguage() {
+		updateLanguage: function() {
 			var lang = this.currentLanguage;
 			console.log('Language changed to: ' + lang);
 			_editor.getSession().setOption('mode', 'ace/mode/' + lang);
 		},
-		insertCode: function insertCode(code) {
+		insertCode: function(code) {
 			// Since we don't have snippets implemented yet,
 			// just strip out the dollar signs
 			var sanitized = code.split(/\$[0-9]/).join('');
 			_editor.insert(sanitized);
 		},
-		loadSketch: function loadSketch(sketch) {
+		loadSketch: function(sketch) {
 			var url = './sketches/' + sketch.fileName;
 			readFileFromURL(url);
 			if (sketch.language) {
@@ -115,7 +113,7 @@ var _toolbar = new Vue({
 		}
 	},
 	// TODO this should be wrapped in vm for ace, and run after ace loads
-	mounted: function mounted() {
+	mounted: function() {
 		// TODO rewrite using Backbone.router
 		var urlVars = getURLVars();
 
@@ -126,7 +124,8 @@ var _toolbar = new Vue({
 			var url = './sketches/' + program;
 			readFileFromURL(url);
 			console.log('Read sketch from ' + url);
-		} else {
+		}
+		else {
 			readFromLocalStorage();
 		}
 
@@ -146,12 +145,13 @@ var _toolbar = new Vue({
 		// TODO replace with an event listener
 		if (urlVars['autorun']) {
 			console.log('Autorunning');
-			setTimeout(function () {
+			setTimeout(function() {
 				evalAll();
 			}, 2000);
 		}
 	}
 });
+
 
 // TODO add highlight
 // https://stackoverflow.com/questions/27531860/how-to-highlight-a-certain-line-in-ace-editor

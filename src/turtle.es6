@@ -1,55 +1,28 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var PromiseWrapper = function PromiseWrapper(promise) {
-	var _this = this;
-
+var PromiseWrapper = function(promise) {
 	// TODO wrap in a Proxy?
 	// Wrap promise in a plain object, with the result attached
 	this.promise = promise;
 	this.value = undefined;
-	this.valueOf = function () {
-		return _this.value;
-	};
-	promise.then(function (result) {
-		_this.value = result;
+	this.valueOf = () => this.value;
+	promise.then((result) => {
+		this.value = result;
 	});
 
 	// TODO proxy function calls
 
 	// Calls fn on the wrapped value
-	this.call = function (fn) {
-		return new PromiseWrapper(promise.then(function (val) {
-			return fn(val);
-		}));
-	};
+	this.call = (fn) => new PromiseWrapper(promise.then((val) => {
+		return fn(val);
+	}));
 
-	this.add = function (arg) {
-		return new PromiseWrapper(promise.then(function (val) {
-			return val + arg;
-		}));
-	};
-	this.sub = function (arg) {
-		return new PromiseWrapper(promise.then(function (val) {
-			return val - arg;
-		}));
-	};
-	this.mul = function (arg) {
-		return new PromiseWrapper(promise.then(function (val) {
-			return val * arg;
-		}));
-	};
-	this.div = function (arg) {
-		return new PromiseWrapper(promise.then(function (val) {
-			return val / arg;
-		}));
-	};
+	this.add = (arg) => new PromiseWrapper(promise.then((val) => (val + arg)));
+	this.sub = (arg) => new PromiseWrapper(promise.then((val) => (val - arg)));
+	this.mul = (arg) => new PromiseWrapper(promise.then((val) => (val * arg)));
+	this.div = (arg) => new PromiseWrapper(promise.then((val) => (val / arg)));
 };
+
 
 /* class Turtle */
 /*
@@ -60,7 +33,7 @@ var PromiseWrapper = function PromiseWrapper(promise) {
  *
  * ang is in degrees, not radians
  */
-var Turtle = function Turtle() {
+var Turtle = function() {
 	// Position and heading
 	this._x = 0;
 	this._y = 0;
@@ -91,12 +64,10 @@ var Turtle = function Turtle() {
 	this._parent = null; // parent of clone
 };
 
-Turtle.prototype._addCommand = function (cmd, args) {
+Turtle.prototype._addCommand = function(cmd, args) {
 	// Create a promise, and resolve/reject it in _executeNextCommand()
 	var resolve, reject;
-	var p = new Promise(function (_resolve, _reject) {
-		resolve = _resolve;reject = _reject;
-	});
+	var p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
 	// Add command to end of queue (beginning of array)
 	this._commandQueue.unshift([cmd, args, resolve, reject]);
 	// Return wrapped promise
@@ -104,12 +75,10 @@ Turtle.prototype._addCommand = function (cmd, args) {
 };
 
 // TODO add promises
-Turtle.prototype._addCommand_ = function (cmd, args) {
+Turtle.prototype._addCommand_ = function(cmd, args) {
 	// Create a promise, and resolve/reject it in _executeNextCommand()
 	var resolve, reject;
-	var p = new Promise(function (_resolve, _reject) {
-		resolve = _resolve;reject = _reject;
-	});
+	var p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
 
 	// If command is not finished, pop from the queue
 	// and make it appear that it reached its destination
@@ -124,10 +93,11 @@ Turtle.prototype._addCommand_ = function (cmd, args) {
 		console.log("Before: " + this._vertices);
 		var lastVertex = this._vertices.pop();
 		if (lastVertex.type == 'point') {
-			lastVertex.to = [this._x, this._y];
+			lastVertex.to = [ this._x, this._y ];
 		}
 		this._vertices.push(lastVertex);
 		console.log("After: " + this._vertices);
+
 	}
 
 	// Add command to front of queue (end of array)
@@ -136,7 +106,7 @@ Turtle.prototype._addCommand_ = function (cmd, args) {
 	return new PromiseWrapper(p);
 };
 
-Turtle.prototype._addVertex = function () {
+Turtle.prototype._addVertex = function() {
 	if (this._isPenDown) {
 		this._vertices.push({
 			type: 'point',
@@ -148,7 +118,7 @@ Turtle.prototype._addVertex = function () {
 	}
 };
 
-Turtle.prototype._addText = function (str) {
+Turtle.prototype._addText = function(str) {
 	this._vertices.push({
 		type: 'text',
 		str: str, at: [this._x, this._y],
@@ -160,13 +130,13 @@ Turtle.prototype._addText = function (str) {
 // (i.e., when using penup, setxy, push, pop)
 // This is so a line segment does not erroneously follow the turtle
 // TODO: Although this could be a useful feature. Pick up and drop line?
-Turtle.prototype._addVoid = function () {
+Turtle.prototype._addVoid = function() {
 	this._vertices.push({ type: 'void' });
 };
 
 // https://www.mathworks.com/help/symbolic/mupad_ref/plot-turtle.html
 // Save the current state
-Turtle.prototype._pushState = function () {
+Turtle.prototype._pushState = function() {
 	this._stateStack.push({
 		position: [this._x, this._y],
 		angle: this._ang,
@@ -176,7 +146,7 @@ Turtle.prototype._pushState = function () {
 };
 
 // Restore the last remembered state and remove it from the list of remembered states
-Turtle.prototype._popState = function () {
+Turtle.prototype._popState = function() {
 	var lastState = this._stateStack.pop();
 	if (lastState) {
 		this._x_new = lastState.position[0];
@@ -190,7 +160,7 @@ Turtle.prototype._popState = function () {
 };
 
 /* Cloning */
-Turtle.prototype._clone = function () {
+Turtle.prototype._clone = function() {
 	this._pushState();
 	var state = this._popState();
 	var newClone = new Turtle();
@@ -206,150 +176,80 @@ Turtle.prototype._clone = function () {
 	// Add the clone to the list of clones
 	this._clones.push(newClone);
 	return newClone;
-};
+}
 
 // Get a list containing itself, its clones, and their clones recursively
-Turtle.prototype._all = function () {
+Turtle.prototype._all = function() {
 	// Base case: no clones
 	if (this._clones.length == 0) {
-		return [this];
+		return [ this ];
 	}
 	// Recursive case
 	else {
-			var flattened = [this];
-			this._clones.forEach(function (clone, i) {
-				flattened = flattened.concat(clone._all());
-			});
-			return flattened;
-		}
-};
+		var flattened = [ this ];
+		this._clones.forEach(function(clone, i) {
+			flattened = flattened.concat(clone._all());
+		});
+		return flattened;
+	}
+}
 
 // Kill clones
 // As a side effect, all clones of the clones are killed as well
-Turtle.prototype._killClones = function () {
-	while (this._clones.length > 0) {
-		this._clones.pop();
-	}
-};
+Turtle.prototype._killClones = function() {
+	while (this._clones.length > 0) { this._clones.pop(); }
+}
 
 // Recursively merge clones' vertices, and kill the clones
-Turtle.prototype._mergeClones = function () {
+Turtle.prototype._mergeClones = function() {
 	var all = this._all();
 	// TODO: add void vertex between the different clones
-	var vertices = all.map(function (clone) {
-		return clone._vertices;
-	}).reduce(function (a, b) {
-		return a.concat(b);
-	});
+	var vertices = all.map((clone) => clone._vertices).reduce((a,b) => a.concat(b));
 	this._vertices = vertices;
 	this.killClones();
-};
+}
 
 /* Turtle commands */
 // Move and draw
-Turtle.prototype.forward = function (n) {
-	return this._addCommand('forward', n);
-};
-Turtle.prototype.backward = function (n) {
-	return this._addCommand('backward', n);
-};
-Turtle.prototype.right = function (n) {
-	return this._addCommand('right', n);
-};
-Turtle.prototype.left = function (n) {
-	return this._addCommand('left', n);
-};
-Turtle.prototype.setxy = function (x, y) {
-	return this._addCommand('setxy', [x, y]);
-};
-Turtle.prototype.setheading = function (ang) {
-	return this._addCommand('setheading', ang);
-};
-Turtle.prototype.write = function (str) {
-	return this._addCommand('write', str);
-};
+Turtle.prototype.forward = function (n) { return this._addCommand('forward', n); };
+Turtle.prototype.backward = function (n) { return this._addCommand('backward', n); };
+Turtle.prototype.right = function (n) { return this._addCommand('right', n); };
+Turtle.prototype.left = function (n) { return this._addCommand('left', n); };
+Turtle.prototype.setxy = function(x, y) { return this._addCommand('setxy', [x, y]); }
+Turtle.prototype.setheading = function(ang) { return this._addCommand('setheading', ang); }
+Turtle.prototype.write = function(str) { return this._addCommand('write', str); }
 
-Turtle.prototype.push = function () {
-	return this._addCommand('push');
-};
-Turtle.prototype.pop = function () {
-	return this._addCommand('pop');
-};
+Turtle.prototype.push = function () { return this._addCommand('push'); };
+Turtle.prototype.pop = function () { return this._addCommand('pop'); };
 
 // Drawing state
-Turtle.prototype.show = function () {
-	return this._addCommand('show');
-};
-Turtle.prototype.hide = function () {
-	return this._addCommand('hide');
-};
-Turtle.prototype.clear = function () {
-	return this._addCommand('clear');
-};
-Turtle.prototype.pendown = function () {
-	return this._addCommand('pendown');
-};
-Turtle.prototype.penup = function () {
-	return this._addCommand('penup');
-};
-Turtle.prototype.color = function () {
-	for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-		args[_key] = arguments[_key];
-	}
+Turtle.prototype.show = function() { return this._addCommand('show'); }
+Turtle.prototype.hide = function() { return this._addCommand('hide'); }
+Turtle.prototype.clear = function() { return this._addCommand('clear'); }
+Turtle.prototype.pendown = function() { return this._addCommand('pendown'); }
+Turtle.prototype.penup = function() { return this._addCommand('penup'); }
+Turtle.prototype.color = function(...args) { return this._addCommand('setcolor', args); }
+Turtle.prototype.width = function(n) { return this._addCommand('setwidth', n); }
 
-	return this._addCommand('setcolor', args);
-};
-Turtle.prototype.width = function (n) {
-	return this._addCommand('setwidth', n);
-};
-
-Turtle.prototype.reset = function () {
-	return this._addCommand('reset');
-};
+Turtle.prototype.reset = function() { return this._addCommand('reset'); }
 
 // Cloning
-Turtle.prototype.clone = function () {
-	return this._addCommand('clone');
-};
-Turtle.prototype.killClones = function () {
-	return this._addCommand('killClones');
-};
-Turtle.prototype.mergeClones = function () {
-	return this._addCommand('mergeClones');
-};
+Turtle.prototype.clone = function() { return this._addCommand('clone'); }
+Turtle.prototype.killClones = function() { return this._addCommand('killClones'); }
+Turtle.prototype.mergeClones = function() { return this._addCommand('mergeClones'); }
 
 // Urgent commands
-Turtle.prototype['show!'] = function () {
-	return this._addCommand_('show');
-};
-Turtle.prototype['hide!'] = function () {
-	return this._addCommand_('hide');
-};
-Turtle.prototype['clear!'] = function () {
-	return this._addCommand_('clear');
-};
-Turtle.prototype['pendown!'] = function () {
-	return this._addCommand_('pendown');
-};
-Turtle.prototype['penup!'] = function () {
-	return this._addCommand_('penup');
-};
-Turtle.prototype['reset!'] = function () {
-	return this._addCommand_('reset');
-};
-Turtle.prototype['setxy!'] = function (x, y) {
-	return this._addCommand_('setxy', [x, y]);
-};
-Turtle.prototype['setheading!'] = function (x, y) {
-	return this._addCommand_('setheading', [x, y]);
-};
+Turtle.prototype['show!'] = function() { return this._addCommand_('show'); }
+Turtle.prototype['hide!'] = function() { return this._addCommand_('hide'); }
+Turtle.prototype['clear!'] = function() { return this._addCommand_('clear'); }
+Turtle.prototype['pendown!'] = function() { return this._addCommand_('pendown'); }
+Turtle.prototype['penup!'] = function() { return this._addCommand_('penup'); }
+Turtle.prototype['reset!'] = function() { return this._addCommand_('reset'); }
+Turtle.prototype['setxy!'] = function(x, y) { return this._addCommand_('setxy', [x, y]); }
+Turtle.prototype['setheading!'] = function(x, y) { return this._addCommand_('setheading', [x, y]); }
 
-Turtle.prototype['stop!'] = function () {
-	return this._addCommand_('stop');
-};
-Turtle.prototype['killClones!'] = function () {
-	return this._addCommand_('killClones');
-};
+Turtle.prototype['stop!'] = function() { return this._addCommand_('stop'); }
+Turtle.prototype['killClones!'] = function() { return this._addCommand_('killClones'); }
 
 // Aliases
 Turtle.prototype.fd = Turtle.prototype.forward;
@@ -365,41 +265,23 @@ Turtle.prototype['goto!'] = Turtle.prototype['setxy!'];
 Turtle.prototype['seth!'] = Turtle.prototype['setheading!'];
 
 // isX -> x?
-Object.defineProperty(Turtle.prototype, 'pendown?', { get: function get() {
-		return this.isPenDown;
-	} });
-Object.defineProperty(Turtle.prototype, 'visible?', { get: function get() {
-		return this.isVisible;
-	} });
+Object.defineProperty(Turtle.prototype, 'pendown?', { get: function() { return this.isPenDown; } });
+Object.defineProperty(Turtle.prototype, 'visible?', { get: function() { return this.isVisible; } });
 
 // Getters
 // TODO define dynamically?
 // TODO make set call the respective set command?
-Object.defineProperty(Turtle.prototype, 'x', { get: function get() {
-		return this._addCommand('getx');
-	} });
-Object.defineProperty(Turtle.prototype, 'y', { get: function get() {
-		return this._addCommand('gety');
-	} });
-Object.defineProperty(Turtle.prototype, 'ang', { get: function get() {
-		return this._addCommand('getheading');
-	} });
-Object.defineProperty(Turtle.prototype, 'color', { get: function get() {
-		return this._addCommand('getcolor');
-	} });
-Object.defineProperty(Turtle.prototype, 'width', { get: function get() {
-		return this._addCommand('getwidth');
-	} });
-Object.defineProperty(Turtle.prototype, 'isPenDown', { get: function get() {
-		return this._addCommand('getIsPenDown');
-	} });
-Object.defineProperty(Turtle.prototype, 'isVisible', { get: function get() {
-		return this._addCommand('getVisible');
-	} });
+Object.defineProperty(Turtle.prototype, 'x', { get: function() { return this._addCommand('getx'); } });
+Object.defineProperty(Turtle.prototype, 'y', { get: function() { return this._addCommand('gety'); } });
+Object.defineProperty(Turtle.prototype, 'ang', { get: function() { return this._addCommand('getheading'); } });
+Object.defineProperty(Turtle.prototype, 'color', { get: function() { return this._addCommand('getcolor'); } });
+Object.defineProperty(Turtle.prototype, 'width', { get: function() { return this._addCommand('getwidth'); } });
+Object.defineProperty(Turtle.prototype, 'isPenDown', { get: function() { return this._addCommand('getIsPenDown'); } });
+Object.defineProperty(Turtle.prototype, 'isVisible', { get: function() { return this._addCommand('getVisible'); } });
 
 // TODO: commandHistory, undo
 
-Turtle.prototype._update = function () {
+Turtle.prototype._update = function() {
 	// If turtle is visible, do all the fancy animation stuff
 	if (this._isVisible) {
 		// Check if turtle has reached its new position (or close enough to it)
@@ -416,38 +298,39 @@ Turtle.prototype._update = function () {
 		}
 		// Otherwise move towards new position
 		else {
-				var diff = new p5.Vector(this._x_new - this._x, this._y_new - this._y);
-				var dist = diff.mag();
-				var dir = diff.normalize(); // destructive
+			var diff = new p5.Vector(this._x_new - this._x, this._y_new - this._y);
+			var dist = diff.mag();
+			var dir = diff.normalize(); // destructive
 
-				// Set them equal to the new values if closer than scale
-				if (dist < this._scale) this._x = this._x_new;else this._x += this._scale * dir.x;
-				if (dist < this._scale) this._y = this._y_new;else this._y += this._scale * dir.y;
+			// Set them equal to the new values if closer than scale
+			if (dist < this._scale) this._x = this._x_new; else this._x += this._scale * dir.x;
+			if (dist < this._scale) this._y = this._y_new; else this._y += this._scale * dir.y;
 
-				this._ang = lerp(this._ang, this._ang_new, 0.5);
-			}
+			this._ang = lerp(this._ang, this._ang_new, 0.5);
+		}
+
 	}
 	// Otherwise just do it the boring way
 	else {
-			// var n = this._commandQueue.length * this._scale; // while (n--)
-			while (this._commandQueue.length > 0) {
-				this._executeNextCommand();
-				this._x = this._x_new;
-				this._y = this._y_new;
-				this._ang = this._ang_new;
-			}
+		// var n = this._commandQueue.length * this._scale; // while (n--)
+		while (this._commandQueue.length > 0) {
+			this._executeNextCommand();
+			this._x = this._x_new;
+			this._y = this._y_new;
+			this._ang = this._ang_new;
 		}
+	}
 
 	// Update clones
-	this._clones.forEach(function (clone, i) {
+	this._clones.forEach(function(clone, i) {
 		clone._update();
-	});
+	})
 };
 
-Turtle.prototype._draw = function () {
+Turtle.prototype._draw = function() {
 	// Make relative to origin
 	push(); // {
-	translate(width / 2, height / 2);
+	translate(width/2, height/2);
 
 	// TODO perspective?
 
@@ -460,26 +343,19 @@ Turtle.prototype._draw = function () {
 			stroke(vertex.color);
 			strokeWeight(vertex.width);
 
-			var _vertex$from = _slicedToArray(vertex.from, 2),
-			    x1 = _vertex$from[0],
-			    y1 = _vertex$from[1];
-
+			var [x1, y1] = vertex.from;
 			var x2, y2;
 
 			// Draw only up to the turtle, don't draw ahead
-			if (i == this._vertices.length - 1 && !this._commandFinished) {
-				var _ref = [this._x, this._y];
-				x2 = _ref[0];
-				y2 = _ref[1];
+			if (i == this._vertices.length-1 && !this._commandFinished) {
+				[x2, y2] = [this._x, this._y];
 			} else {
-				var _vertex$to = _slicedToArray(vertex.to, 2);
-
-				x2 = _vertex$to[0];
-				y2 = _vertex$to[1];
+				[x2, y2] = vertex.to;
 			}
 
 			line(x1, -y1, x2, -y2);
-		} else if (vertex.type == 'text') {
+		}
+		else if (vertex.type == 'text') {
 			noStroke();
 			fill(vertex.color);
 			text(vertex.str, vertex.at[0], -vertex.at[1]);
@@ -510,27 +386,20 @@ Turtle.prototype._draw = function () {
 	pop(); // }
 
 	// Draw clones
-	this._clones.forEach(function (clone, i) {
+	this._clones.forEach(function(clone, i) {
 		clone._draw();
-	});
+	})
 };
 
-Turtle.prototype._executeNextCommand = function () {
+Turtle.prototype._executeNextCommand = function() {
 	// Get next command in command queue
 	var command = this._commandQueue.pop();
 	if (command) {
 		this._commandFinished = false;
-
-		var _command = _slicedToArray(command, 4),
-		    cmd = _command[0],
-		    args = _command[1],
-		    resolve = _command[2],
-		    reject = _command[3];
+		var [ cmd, args, resolve, reject ] = command;
 
 		// Unwrap promise and pass it on to the next if statement
-
-
-		if ((typeof args === 'undefined' ? 'undefined' : _typeof(args)) === 'object' && args instanceof PromiseWrapper) {
+		if (typeof args === 'object' && args instanceof PromiseWrapper) {
 			args = args.valueOf;
 		}
 
@@ -542,9 +411,8 @@ Turtle.prototype._executeNextCommand = function () {
 
 		switch (cmd) {
 			case 'forward':
-				if (typeof args !== 'number') {
-					reject();
-				} else {
+				if (typeof args !== 'number') { reject(); }
+				else {
 					logText('Forward ' + args);
 					this._x_new = this._x + args * Math.cos(radians(this._ang));
 					this._y_new = this._y + args * Math.sin(radians(this._ang));
@@ -553,9 +421,8 @@ Turtle.prototype._executeNextCommand = function () {
 				}
 				break;
 			case 'backward':
-				if (typeof args !== 'number') {
-					reject();
-				} else {
+				if (typeof args !== 'number') { reject(); }
+				else {
 					logText('Backward ' + args);
 					this._x_new = this._x - args * Math.cos(radians(this._ang));
 					this._y_new = this._y - args * Math.sin(radians(this._ang));
@@ -564,20 +431,18 @@ Turtle.prototype._executeNextCommand = function () {
 				}
 				break;
 			case 'right':
-				if (typeof args !== 'number') {
-					reject();
-				} else {
+				if (typeof args !== 'number') { reject(); }
+				else {
 					logText('Right ' + args);
-					this._ang_new = this._ang - args;
+					this._ang_new = (this._ang - args);
 					resolve();
 				}
 				break;
 			case 'left':
-				if (typeof args !== 'number') {
-					reject();
-				} else {
+				if (typeof args !== 'number') { reject(); }
+				else {
 					logText('Left ' + args);
-					this._ang_new = this._ang + args;
+					this._ang_new = (this._ang + args);
 					resolve();
 				}
 				break;
@@ -638,7 +503,7 @@ Turtle.prototype._executeNextCommand = function () {
 				break;
 			case 'setcolor':
 				logText('Set color to ' + args);
-				this._color = color.apply(undefined, _toConsumableArray(args)); // wrap using p5.Color
+				this._color = color(...args); // wrap using p5.Color
 				resolve();
 				break;
 			case 'setwidth':
@@ -661,9 +526,7 @@ Turtle.prototype._executeNextCommand = function () {
 
 				// Reset command queue
 				// Why doesn't this work? this._commandQueue.length = 0;
-				while (this._commandQueue.length > 0) {
-					this._commandQueue.pop();
-				}
+				while (this._commandQueue.length > 0) { this._commandQueue.pop(); }
 				resolve();
 				break;
 
@@ -689,22 +552,14 @@ Turtle.prototype._executeNextCommand = function () {
 			// Getters
 			// TODO: cleanup
 			// clones, color, width, parent
-			case 'getx':
-				resolve(this._x);break;
-			case 'gety':
-				resolve(this._y);break;
-			case 'getxy':
-				resolve([this._x, this._y]);break;
-			case 'getheading':
-				resolve(this._ang);break;
-			case 'getcolor':
-				resolve(this._color);break;
-			case 'getwidth':
-				resolve(this._width);break;
-			case 'getIsPenDown':
-				resolve(this._isPenDown);break;
-			case 'getIsVisible':
-				resolve(this._isVisible);break;
+			case 'getx': resolve(this._x); break;
+			case 'gety': resolve(this._y); break;
+			case 'getxy': resolve([this._x, this._y]); break;
+			case 'getheading': resolve(this._ang); break;
+			case 'getcolor': resolve(this._color); break;
+			case 'getwidth': resolve(this._width); break;
+			case 'getIsPenDown': resolve(this._isPenDown); break;
+			case 'getIsVisible': resolve(this._isVisible); break;
 
 			case 'call':
 				// Function is passed as an argument
@@ -713,9 +568,9 @@ Turtle.prototype._executeNextCommand = function () {
 				break;
 		}
 	}
-};
+}
 
-Turtle.prototype._debug = function () {
+Turtle.prototype._debug = function() {
 	if (this.isDebug) {
 		var s = '';
 		s += 'Position: ' + [this._x, this._y] + '\n';
@@ -737,19 +592,15 @@ var message = '';
 
 // Proxy for all clones
 var cloneProxy = new Proxy({}, {
-	get: function get(target, key) {
+	get: (target, key) => {
 		// Output a function
-		return function () {
-			for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-				args[_key2] = arguments[_key2];
-			}
-
+		return (...args) => {
 			var all = t._all();
 			// Proxy the function call to each clone
-			return all.map(function (clone) {
+			return all.map((clone) => {
 				var prop = clone[key];
 				if (typeof prop === 'function') {
-					clone[key].apply(clone, args);
+					clone[key](...args);
 				}
 			});
 		};
@@ -790,9 +641,7 @@ function draw(p) {
 		fill(255);
 		strokeWeight(0);
 		var m = message;
-		if (isMacroRecording) {
-			m = 'Macro recording -- ' + m;
-		}
+		if (isMacroRecording) { m = 'Macro recording -- ' + m; }
 		text(m, 50, height - 50);
 		pop(); // }
 	}
@@ -821,7 +670,7 @@ var isMacroRecording = false;
 function parseKey(key) {
 	var addToMacro = true;
 
-	switch (key) {
+	switch(key) {
 		// Special keys
 		case BACKSPACE:
 			countPrefix = 0;
@@ -829,48 +678,34 @@ function parseKey(key) {
 			break;
 
 		// Number keys
-		case '0':case '1':case '2':case '3':case '4':
-		case '5':case '6':case '7':case '8':case '9':
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
 			countPrefix = countPrefix * 10 + parseInt(key);
 			logText('Count prefix: ' + countPrefix);
 			break;
 
 		// WASD and hjkl bindings
-		case 'w':case 'k':
-			proxy.forward(countPrefix ? countPrefix : 20);countPrefix = 0;break;
-		case 's':case 'j':
-			proxy.backward(countPrefix ? countPrefix : 20);countPrefix = 0;break;
-		case 'd':case 'l':
-			proxy.right(countPrefix ? countPrefix : 20);countPrefix = 0;break;
-		case 'a':case 'h':
-			proxy.left(countPrefix ? countPrefix : 20);countPrefix = 0;break;
+		case 'w': case 'k': proxy.forward(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 's': case 'j': proxy.backward(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 'd': case 'l': proxy.right(countPrefix ? countPrefix : 20); countPrefix = 0; break;
+		case 'a': case 'h': proxy.left(countPrefix ? countPrefix : 20); countPrefix = 0; break;
 
-		case 'c':
-			proxy['clear!']();break;
-		case 'r':
-			proxy['stop!']();proxy['reset!']();proxy['killClones!']();break;
-		case ',':case '¼':
-			proxy['pendown!']();break; // Comma
-		case '.':case '¾':
-			proxy['penup!']();break; // Period
-		case '\\':
-			proxy._isVisible ? proxy['hide!']() : proxy['show!']();break;
+		case 'c': proxy['clear!'](); break;
+		case 'r': proxy['stop!'](); proxy['reset!'](); proxy['killClones!'](); break;
+		case ',': case '¼': proxy['pendown!'](); break; // Comma
+		case '.': case '¾': proxy['penup!'](); break; // Period
+		case '\\': proxy._isVisible ? proxy['hide!']() : proxy['show!'](); break;
 
 		// Macro
 		case 'q':
 			// Record if stopped, Stop if recording
-			if (isMacroRecording) {
-				stopRecordingMacro();
-			} else {
-				recordMacro();
-			}
+			if (isMacroRecording) { stopRecordingMacro(); }
+			else { recordMacro(); }
 			addToMacro = false;
 			break;
 
 		case '@':
-			repeat(countPrefix ? countPrefix : 1, function () {
-				playMacro();
-			});
+			repeat(countPrefix ? countPrefix : 1, function() { playMacro(); });
 			addToMacro = false;
 			break;
 
@@ -912,8 +747,7 @@ function stopRecordingMacro() {
 
 function playMacro() {
 	// Don't play the current macro when currently recording a macro
-	if (!isMacroRecording) {
-		// TODO
+	if (!isMacroRecording) { // TODO
 		logText('Playing macro: ' + macro.join(''));
 		for (var i in macro) {
 			parseKey(macro[i]);
@@ -921,11 +755,11 @@ function playMacro() {
 	}
 	// Play the old macro instead
 	else {
-			logText('Playing old macro: ' + macro_old);
-			for (var i in macro_old) {
-				parseKey(macro_old[i]);
-			}
+		logText('Playing old macro: ' + macro_old);
+		for (var i in macro_old) {
+			parseKey(macro_old[i]);
 		}
+	}
 }
 
 // Log text to console and canvas

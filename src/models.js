@@ -1,3 +1,5 @@
+'use strict';
+
 // MVC stuff?
 var defaultLanguage = 'coffee';
 

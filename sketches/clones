@@ -1,4 +1,3 @@
-# Only this example works for now:
 a = t.clone()
 4.times ->
     a.call((x) => 
@@ -15,16 +14,16 @@ logText("Clones: #{t._all().length}")
 # Be careful, since 2^n clones are spawned on the nth iteration!
 # This will slow down your computer a lot!
 
-t.penup
+t.penup()
 t.back 300
-t.pendown
-t.hide
+t.pendown()
+t.hide()
 
-t.all.each do |a|
+t._all.each do |a|
     ang = 45
     len = 20
     
-    b = a.clone()
+    b = a._clone()
     b.hide()
 
     a.lt ang
@@ -38,14 +37,14 @@ t.all.each do |a|
     b.fd len
 end
 
-t.killClones(); t.reset
+t.killClones(); t.reset()
 
 ###############
 # Draw a random binary tree by spawning clones
 # Looks like the roots of a plant
 
-t.all.each do |a|
-    b = a.clone()
+t._all.each do |a|
+    b = a._clone()
     # b.hide()
     a.lt rand(90)
     a.fd rand(50) + 10
@@ -53,13 +52,13 @@ t.all.each do |a|
     b.fd rand(50) + 10
 end
 
-t.killClones; t.reset
+t.killClones(); t.reset()
 
 ###############
 # Some kind of cool pattern
 
-t.all.each do |a|
-    b = a.clone()
+t._all.each do |a|
+    b = a._clone()
     b.rt 90
     a.fd 20
     b.fd 20
