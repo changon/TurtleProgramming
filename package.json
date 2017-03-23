@@ -11,12 +11,11 @@
     "url": "https://github.com/changon/TurtleProgramming/issues"
   },
   "homepage": "https://github.com/changon/TurtleProgramming#readme",
+  "scripts": {
+    "watch": ". ./watch.sh"
+  },
   "devDependencies": {
-    "babel-preset-env": "^1.2.2",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-pug": "^3.3.0",
-    "gulp-server-livereload": "^1.9.2"
+    "babel-preset-env": "^1.2.2"
   },
   "dependencies": {
     "pug": "^2.0.0-beta11"
