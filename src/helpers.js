@@ -86,6 +86,11 @@ function render(iframe, code) {
 			console.error(err.toString());
 		});
 		break;
+	case 'lua':
+		result.compiledCode = w.starlight.parser.parseToString(code);
+		console.log(result.compiledCode);
+		result.returnValue = w.starlight.parser.parse(code)();
+		break;
 	}
 
 	console.log('Executing code', result);

@@ -8,6 +8,7 @@ var supportedLanguages = {
 	'coffee': 'CoffeeScript',
 	'ruby': 'Ruby',
 	'python': 'Python',
+	'lua': 'Lua'
 };
 
 // TODO: turn into snippets
