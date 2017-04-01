@@ -15,6 +15,7 @@ var PromiseWrapper = function PromiseWrapper(promise) {
 
 	// TODO wrap in a Proxy?
 	// Wrap promise in a plain object, with the result attached
+	// TODO use async/await?
 	this.promise = promise;
 	this.value = undefined;
 	this.valueOf = function () {
@@ -103,7 +104,7 @@ Turtle.prototype._addCommand = function (cmd, args) {
 		resolve = _resolve;reject = _reject;
 	});
 	// Add command to end of queue (beginning of array)
-	this._commandQueue.unshift([cmd, args, resolve, reject]);
+	this._commandQueue.unshift({ cmd: cmd, args: args, resolve: resolve, reject: reject });
 	// Return wrapped promise
 	return new PromiseWrapper(p);
 };
@@ -114,7 +115,8 @@ Turtle.prototype._addCommand_ = function (cmd, args) {
 	var resolve = void 0,
 	    reject = void 0;
 	var p = new Promise(function (_resolve, _reject) {
-		resolve = _resolve;reject = _reject;
+		resolve = _resolve;
+		reject = _reject;
 	});
 
 	// If command is not finished, pop from the queue
@@ -137,7 +139,7 @@ Turtle.prototype._addCommand_ = function (cmd, args) {
 	}
 
 	// Add command to front of queue (end of array)
-	this._commandQueue.push([cmd, args, resolve, reject]);
+	this._commandQueue.push({ cmd: cmd, args: args, resolve: resolve, reject: reject });
 	// Return wrapped promise
 	return new PromiseWrapper(p);
 };
@@ -249,6 +251,13 @@ Turtle.prototype._mergeClones = function () {
 	});
 	this._vertices = vertices;
 	this.killClones();
+};
+
+// Sleep
+Turtle.prototype._sleep = function (ms) {
+	return new Promise(function (resolve) {
+		return setTimeout(resolve, ms);
+	});
 };
 
 /* Turtle commands */
@@ -527,15 +536,12 @@ Turtle.prototype._executeNextCommand = function () {
 	var command = this._commandQueue.pop();
 	if (command) {
 		this._commandFinished = false;
-
-		var _command = _slicedToArray(command, 4),
-		    cmd = _command[0],
-		    _args = _command[1],
-		    resolve = _command[2],
-		    reject = _command[3];
+		var cmd = command.cmd,
+		    _args = command.args,
+		    resolve = command.resolve,
+		    reject = command.reject;
 
 		// Unwrap promise and pass it on to the next if statement
-
 
 		if ((typeof _args === 'undefined' ? 'undefined' : _typeof(_args)) === 'object' && _args instanceof PromiseWrapper) {
 			_args = _args.valueOf;

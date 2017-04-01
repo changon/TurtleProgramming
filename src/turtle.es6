@@ -7,6 +7,7 @@
 let PromiseWrapper = function(promise) {
 	// TODO wrap in a Proxy?
 	// Wrap promise in a plain object, with the result attached
+	// TODO use async/await?
 	this.promise = promise;
 	this.value = undefined;
 	this.valueOf = () => this.value;
@@ -73,7 +74,7 @@ Turtle.prototype._addCommand = function(cmd, args) {
 	let resolve, reject;
 	let p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
 	// Add command to end of queue (beginning of array)
-	this._commandQueue.unshift([cmd, args, resolve, reject]);
+	this._commandQueue.unshift({ cmd, args, resolve, reject });
 	// Return wrapped promise
 	return new PromiseWrapper(p);
 };
@@ -82,7 +83,7 @@ Turtle.prototype._addCommand = function(cmd, args) {
 Turtle.prototype._addCommand_ = function(cmd, args) {
 	// Create a promise, and resolve/reject it in _executeNextCommand()
 	let resolve, reject;
-	let p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
+	let p = new Promise((_resolve, _reject) => { [ resolve, reject ] = [ _resolve, _reject ]; });
 
 	// If command is not finished, pop from the queue
 	// and make it appear that it reached its destination
@@ -105,7 +106,7 @@ Turtle.prototype._addCommand_ = function(cmd, args) {
 	}
 
 	// Add command to front of queue (end of array)
-	this._commandQueue.push([cmd, args, resolve, reject]);
+	this._commandQueue.push({ cmd, args, resolve, reject });
 	// Return wrapped promise
 	return new PromiseWrapper(p);
 };
@@ -211,6 +212,11 @@ Turtle.prototype._mergeClones = function() {
 	let vertices = all.map((clone) => clone._vertices).reduce((a,b) => a.concat(b));
 	this._vertices = vertices;
 	this.killClones();
+}
+
+// Sleep
+Turtle.prototype._sleep = function(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /* Turtle commands */
@@ -400,7 +406,7 @@ Turtle.prototype._executeNextCommand = function() {
 	let command = this._commandQueue.pop();
 	if (command) {
 		this._commandFinished = false;
-		let [ cmd, args, resolve, reject ] = command;
+		let { cmd, args, resolve, reject } = command;
 
 		// Unwrap promise and pass it on to the next if statement
 		if (typeof args === 'object' && args instanceof PromiseWrapper) {
