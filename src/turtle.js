@@ -1,5 +1,9 @@
 'use strict';
 
+// TODO use async/await
+// instead of a PromiseWrapper
+// make each command await the promise returned by the last command
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
@@ -93,7 +97,8 @@ var Turtle = function Turtle() {
 
 Turtle.prototype._addCommand = function (cmd, args) {
 	// Create a promise, and resolve/reject it in _executeNextCommand()
-	var resolve, reject;
+	var resolve = void 0,
+	    reject = void 0;
 	var p = new Promise(function (_resolve, _reject) {
 		resolve = _resolve;reject = _reject;
 	});
@@ -106,7 +111,8 @@ Turtle.prototype._addCommand = function (cmd, args) {
 // TODO add promises
 Turtle.prototype._addCommand_ = function (cmd, args) {
 	// Create a promise, and resolve/reject it in _executeNextCommand()
-	var resolve, reject;
+	var resolve = void 0,
+	    reject = void 0;
 	var p = new Promise(function (_resolve, _reject) {
 		resolve = _resolve;reject = _reject;
 	});
@@ -123,7 +129,7 @@ Turtle.prototype._addCommand_ = function (cmd, args) {
 		// Modify the last line drawn
 		console.log("Before: " + this._vertices);
 		var lastVertex = this._vertices.pop();
-		if (lastVertex.type == 'point') {
+		if (lastVertex.type === 'point') {
 			lastVertex.to = [this._x, this._y];
 		}
 		this._vertices.push(lastVertex);
@@ -211,7 +217,7 @@ Turtle.prototype._clone = function () {
 // Get a list containing itself, its clones, and their clones recursively
 Turtle.prototype._all = function () {
 	// Base case: no clones
-	if (this._clones.length == 0) {
+	if (this._clones.length === 0) {
 		return [this];
 	}
 	// Recursive case
@@ -403,8 +409,8 @@ Turtle.prototype._update = function () {
 	// If turtle is visible, do all the fancy animation stuff
 	if (this._isVisible) {
 		// Check if turtle has reached its new position (or close enough to it)
-		var x_eq = this._x_new == this._x;
-		var y_eq = this._y_new == this._y;
+		var x_eq = this._x_new === this._x;
+		var y_eq = this._y_new === this._y;
 		var ang_eq = Math.abs(this._ang_new - this._ang) < 1;
 
 		// If it has, then execute the next command
@@ -429,7 +435,7 @@ Turtle.prototype._update = function () {
 	}
 	// Otherwise just do it the boring way
 	else {
-			// var n = this._commandQueue.length * this._scale; // while (n--)
+			// let n = this._commandQueue.length * this._scale; // while (n--)
 			while (this._commandQueue.length > 0) {
 				this._executeNextCommand();
 				this._x = this._x_new;
@@ -456,7 +462,7 @@ Turtle.prototype._draw = function () {
 	for (var i = 0; i < this._vertices.length; i++) {
 		push(); // {
 		var vertex = this._vertices[i];
-		if (vertex.type == 'point') {
+		if (vertex.type === 'point') {
 			stroke(vertex.color);
 			strokeWeight(vertex.width);
 
@@ -464,10 +470,11 @@ Turtle.prototype._draw = function () {
 			    x1 = _vertex$from[0],
 			    y1 = _vertex$from[1];
 
-			var x2, y2;
+			var x2 = void 0,
+			    y2 = void 0;
 
 			// Draw only up to the turtle, don't draw ahead
-			if (i == this._vertices.length - 1 && !this._commandFinished) {
+			if (i === this._vertices.length - 1 && !this._commandFinished) {
 				var _ref = [this._x, this._y];
 				x2 = _ref[0];
 				y2 = _ref[1];
@@ -479,7 +486,7 @@ Turtle.prototype._draw = function () {
 			}
 
 			line(x1, -y1, x2, -y2);
-		} else if (vertex.type == 'text') {
+		} else if (vertex.type === 'text') {
 			noStroke();
 			fill(vertex.color);
 			text(vertex.str, vertex.at[0], -vertex.at[1]);
@@ -523,74 +530,74 @@ Turtle.prototype._executeNextCommand = function () {
 
 		var _command = _slicedToArray(command, 4),
 		    cmd = _command[0],
-		    args = _command[1],
+		    _args = _command[1],
 		    resolve = _command[2],
 		    reject = _command[3];
 
 		// Unwrap promise and pass it on to the next if statement
 
 
-		if ((typeof args === 'undefined' ? 'undefined' : _typeof(args)) === 'object' && args instanceof PromiseWrapper) {
-			args = args.valueOf;
+		if ((typeof _args === 'undefined' ? 'undefined' : _typeof(_args)) === 'object' && _args instanceof PromiseWrapper) {
+			_args = _args.valueOf;
 		}
 
 		// Unwrap function
 		// This is essentially lazy evaluation
-		if (typeof args === 'function') {
-			args = args();
+		if (typeof _args === 'function') {
+			_args = _args();
 		}
 
 		switch (cmd) {
 			case 'forward':
-				if (typeof args !== 'number') {
+				if (typeof _args !== 'number') {
 					reject();
 				} else {
-					logText('Forward ' + args);
-					this._x_new = this._x + args * Math.cos(radians(this._ang));
-					this._y_new = this._y + args * Math.sin(radians(this._ang));
+					logText('Forward ' + _args);
+					this._x_new = this._x + _args * Math.cos(radians(this._ang));
+					this._y_new = this._y + _args * Math.sin(radians(this._ang));
 					this._addVertex();
 					resolve();
 				}
 				break;
 			case 'backward':
-				if (typeof args !== 'number') {
+				if (typeof _args !== 'number') {
 					reject();
 				} else {
-					logText('Backward ' + args);
-					this._x_new = this._x - args * Math.cos(radians(this._ang));
-					this._y_new = this._y - args * Math.sin(radians(this._ang));
+					logText('Backward ' + _args);
+					this._x_new = this._x - _args * Math.cos(radians(this._ang));
+					this._y_new = this._y - _args * Math.sin(radians(this._ang));
 					this._addVertex();
 					resolve();
 				}
 				break;
 			case 'right':
-				if (typeof args !== 'number') {
+				if (typeof _args !== 'number') {
 					reject();
 				} else {
-					logText('Right ' + args);
-					this._ang_new = this._ang - args;
+					logText('Right ' + _args);
+					this._ang_new = this._ang - _args;
 					resolve();
 				}
 				break;
 			case 'left':
-				if (typeof args !== 'number') {
+				if (typeof _args !== 'number') {
 					reject();
 				} else {
-					logText('Left ' + args);
-					this._ang_new = this._ang + args;
+					logText('Left ' + _args);
+					this._ang_new = this._ang + _args;
 					resolve();
 				}
 				break;
 			case 'setxy':
-				logText('Set [x, y] to ' + args);
-				this._x_new = args[0];
-				this._y_new = args[1];
+				logText('Set [x, y] to ' + _args);
+				this._x_new = _args[0];
+				this._y_new = _args[1];
 				this._addVoid();
 				resolve();
 				break;
 			case 'setheading':
-				logText('Set heading to ' + args);
-				this._ang_new = args;
+				logText('Set heading to ' + _args);
+				this._ang_new = _args;
 				resolve();
 				break;
 			case 'hide':
@@ -609,8 +616,8 @@ Turtle.prototype._executeNextCommand = function () {
 				resolve();
 				break;
 			case 'write':
-				logText('Write "' + args + '"');
-				this._addText(args);
+				logText('Write "' + _args + '"');
+				this._addText(_args);
 				resolve();
 				break;
 			case 'push':
@@ -637,13 +644,13 @@ Turtle.prototype._executeNextCommand = function () {
 				resolve();
 				break;
 			case 'setcolor':
-				logText('Set color to ' + args);
-				this._color = color.apply(undefined, _toConsumableArray(args)); // wrap using p5.Color
+				logText('Set color to ' + _args);
+				this._color = color.apply(undefined, _toConsumableArray(_args)); // wrap using p5.Color
 				resolve();
 				break;
 			case 'setwidth':
-				logText('Set width to ' + args);
-				this._width = args;
+				logText('Set width to ' + _args);
+				this._width = _args;
 				resolve();
 				break;
 			case 'reset':
@@ -708,7 +715,7 @@ Turtle.prototype._executeNextCommand = function () {
 
 			case 'call':
 				// Function is passed as an argument
-				var fn = args;
+				var fn = _args;
 				resolve(fn());
 				break;
 		}
@@ -731,7 +738,7 @@ Turtle.prototype._debug = function () {
 
 // This is the mother of all turtles (MOAT)
 var t = new Turtle();
-var canvas;
+var canvas = void 0;
 var bgcolor = 0; // 200, 64
 var message = '';
 
@@ -760,9 +767,9 @@ var cloneProxy = new Proxy({}, {
 // Set the proxy: either just the MOAT, or all clones
 // TODO use a viewmodel for this
 var proxy = cloneProxy;
-// var proxy = t;
+// let proxy = t;
 
-// var sketch = {};
+// let sketch = {};
 // sketch.setup = function(p) {
 function setup(p) {
 	canvas = createCanvas(windowWidth, windowHeight);
@@ -887,7 +894,7 @@ function parseKey(key) {
 
 function keyPressed() {
 	// Only parse backspace
-	if (keyCode == BACKSPACE) {
+	if (keyCode === BACKSPACE) {
 		parseKey(keyCode);
 	}
 }
@@ -922,8 +929,8 @@ function playMacro() {
 	// Play the old macro instead
 	else {
 			logText('Playing old macro: ' + macro_old);
-			for (var i in macro_old) {
-				parseKey(macro_old[i]);
+			for (var _i in macro_old) {
+				parseKey(macro_old[_i]);
 			}
 		}
 }

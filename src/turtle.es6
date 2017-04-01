@@ -1,6 +1,10 @@
 'use strict';
 
-var PromiseWrapper = function(promise) {
+// TODO use async/await
+// instead of a PromiseWrapper
+// make each command await the promise returned by the last command
+
+let PromiseWrapper = function(promise) {
 	// TODO wrap in a Proxy?
 	// Wrap promise in a plain object, with the result attached
 	this.promise = promise;
@@ -33,7 +37,7 @@ var PromiseWrapper = function(promise) {
  *
  * ang is in degrees, not radians
  */
-var Turtle = function() {
+let Turtle = function() {
 	// Position and heading
 	this._x = 0;
 	this._y = 0;
@@ -66,8 +70,8 @@ var Turtle = function() {
 
 Turtle.prototype._addCommand = function(cmd, args) {
 	// Create a promise, and resolve/reject it in _executeNextCommand()
-	var resolve, reject;
-	var p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
+	let resolve, reject;
+	let p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
 	// Add command to end of queue (beginning of array)
 	this._commandQueue.unshift([cmd, args, resolve, reject]);
 	// Return wrapped promise
@@ -77,8 +81,8 @@ Turtle.prototype._addCommand = function(cmd, args) {
 // TODO add promises
 Turtle.prototype._addCommand_ = function(cmd, args) {
 	// Create a promise, and resolve/reject it in _executeNextCommand()
-	var resolve, reject;
-	var p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
+	let resolve, reject;
+	let p = new Promise((_resolve, _reject) => { resolve = _resolve; reject = _reject; });
 
 	// If command is not finished, pop from the queue
 	// and make it appear that it reached its destination
@@ -91,8 +95,8 @@ Turtle.prototype._addCommand_ = function(cmd, args) {
 
 		// Modify the last line drawn
 		console.log("Before: " + this._vertices);
-		var lastVertex = this._vertices.pop();
-		if (lastVertex.type == 'point') {
+		let lastVertex = this._vertices.pop();
+		if (lastVertex.type === 'point') {
 			lastVertex.to = [ this._x, this._y ];
 		}
 		this._vertices.push(lastVertex);
@@ -147,7 +151,7 @@ Turtle.prototype._pushState = function() {
 
 // Restore the last remembered state and remove it from the list of remembered states
 Turtle.prototype._popState = function() {
-	var lastState = this._stateStack.pop();
+	let lastState = this._stateStack.pop();
 	if (lastState) {
 		this._x_new = lastState.position[0];
 		this._y_new = lastState.position[1];
@@ -162,8 +166,8 @@ Turtle.prototype._popState = function() {
 /* Cloning */
 Turtle.prototype._clone = function() {
 	this._pushState();
-	var state = this._popState();
-	var newClone = new Turtle();
+	let state = this._popState();
+	let newClone = new Turtle();
 	newClone._parent = this;
 	// TODO this is abusing push/pop so much...
 	newClone._stateStack.push(state);
@@ -181,12 +185,12 @@ Turtle.prototype._clone = function() {
 // Get a list containing itself, its clones, and their clones recursively
 Turtle.prototype._all = function() {
 	// Base case: no clones
-	if (this._clones.length == 0) {
+	if (this._clones.length === 0) {
 		return [ this ];
 	}
 	// Recursive case
 	else {
-		var flattened = [ this ];
+		let flattened = [ this ];
 		this._clones.forEach(function(clone, i) {
 			flattened = flattened.concat(clone._all());
 		});
@@ -202,9 +206,9 @@ Turtle.prototype._killClones = function() {
 
 // Recursively merge clones' vertices, and kill the clones
 Turtle.prototype._mergeClones = function() {
-	var all = this._all();
+	let all = this._all();
 	// TODO: add void vertex between the different clones
-	var vertices = all.map((clone) => clone._vertices).reduce((a,b) => a.concat(b));
+	let vertices = all.map((clone) => clone._vertices).reduce((a,b) => a.concat(b));
 	this._vertices = vertices;
 	this.killClones();
 }
@@ -285,9 +289,9 @@ Turtle.prototype._update = function() {
 	// If turtle is visible, do all the fancy animation stuff
 	if (this._isVisible) {
 		// Check if turtle has reached its new position (or close enough to it)
-		var x_eq = this._x_new == this._x;
-		var y_eq = this._y_new == this._y;
-		var ang_eq = Math.abs(this._ang_new - this._ang) < 1;
+		let x_eq = this._x_new === this._x;
+		let y_eq = this._y_new === this._y;
+		let ang_eq = Math.abs(this._ang_new - this._ang) < 1;
 
 		// If it has, then execute the next command
 		if (x_eq && y_eq && ang_eq) {
@@ -298,9 +302,9 @@ Turtle.prototype._update = function() {
 		}
 		// Otherwise move towards new position
 		else {
-			var diff = new p5.Vector(this._x_new - this._x, this._y_new - this._y);
-			var dist = diff.mag();
-			var dir = diff.normalize(); // destructive
+			let diff = new p5.Vector(this._x_new - this._x, this._y_new - this._y);
+			let dist = diff.mag();
+			let dir = diff.normalize(); // destructive
 
 			// Set them equal to the new values if closer than scale
 			if (dist < this._scale) this._x = this._x_new; else this._x += this._scale * dir.x;
@@ -312,7 +316,7 @@ Turtle.prototype._update = function() {
 	}
 	// Otherwise just do it the boring way
 	else {
-		// var n = this._commandQueue.length * this._scale; // while (n--)
+		// let n = this._commandQueue.length * this._scale; // while (n--)
 		while (this._commandQueue.length > 0) {
 			this._executeNextCommand();
 			this._x = this._x_new;
@@ -336,18 +340,18 @@ Turtle.prototype._draw = function() {
 
 	//_ Draw vertices
 	// TODO: rename this._vertices
-	for (var i = 0; i < this._vertices.length; i++) {
+	for (let i = 0; i < this._vertices.length; i++) {
 		push(); // {
-		var vertex = this._vertices[i];
-		if (vertex.type == 'point') {
+		let vertex = this._vertices[i];
+		if (vertex.type === 'point') {
 			stroke(vertex.color);
 			strokeWeight(vertex.width);
 
-			var [x1, y1] = vertex.from;
-			var x2, y2;
+			let [x1, y1] = vertex.from;
+			let x2, y2;
 
 			// Draw only up to the turtle, don't draw ahead
-			if (i == this._vertices.length-1 && !this._commandFinished) {
+			if (i === this._vertices.length-1 && !this._commandFinished) {
 				[x2, y2] = [this._x, this._y];
 			} else {
 				[x2, y2] = vertex.to;
@@ -355,7 +359,7 @@ Turtle.prototype._draw = function() {
 
 			line(x1, -y1, x2, -y2);
 		}
-		else if (vertex.type == 'text') {
+		else if (vertex.type === 'text') {
 			noStroke();
 			fill(vertex.color);
 			text(vertex.str, vertex.at[0], -vertex.at[1]);
@@ -393,10 +397,10 @@ Turtle.prototype._draw = function() {
 
 Turtle.prototype._executeNextCommand = function() {
 	// Get next command in command queue
-	var command = this._commandQueue.pop();
+	let command = this._commandQueue.pop();
 	if (command) {
 		this._commandFinished = false;
-		var [ cmd, args, resolve, reject ] = command;
+		let [ cmd, args, resolve, reject ] = command;
 
 		// Unwrap promise and pass it on to the next if statement
 		if (typeof args === 'object' && args instanceof PromiseWrapper) {
@@ -533,7 +537,7 @@ Turtle.prototype._executeNextCommand = function() {
 			// Cloning
 			case 'clone':
 				logText('Clone');
-				var clone = this._clone();
+				let clone = this._clone();
 				resolve(clone);
 				break;
 
@@ -563,7 +567,7 @@ Turtle.prototype._executeNextCommand = function() {
 
 			case 'call':
 				// Function is passed as an argument
-				var fn = args;
+				let fn = args;
 				resolve(fn());
 				break;
 		}
@@ -572,7 +576,7 @@ Turtle.prototype._executeNextCommand = function() {
 
 Turtle.prototype._debug = function() {
 	if (this.isDebug) {
-		var s = '';
+		let s = '';
 		s += 'Position: ' + [this._x, this._y] + '\n';
 		s += 'Heading: ' + this._ang + '\n';
 		s += 'New position' + [this._x_new, this._y_new] + '\n';
@@ -585,20 +589,20 @@ Turtle.prototype._debug = function() {
 /******************************************************************************/
 
 // This is the mother of all turtles (MOAT)
-var t = new Turtle();
-var canvas;
-var bgcolor = 0; // 200, 64
-var message = '';
+let t = new Turtle();
+let canvas;
+let bgcolor = 0; // 200, 64
+let message = '';
 
 // Proxy for all clones
-var cloneProxy = new Proxy({}, {
+let cloneProxy = new Proxy({}, {
 	get: (target, key) => {
 		// Output a function
 		return (...args) => {
-			var all = t._all();
+			let all = t._all();
 			// Proxy the function call to each clone
 			return all.map((clone) => {
-				var prop = clone[key];
+				let prop = clone[key];
 				if (typeof prop === 'function') {
 					clone[key](...args);
 				}
@@ -610,10 +614,10 @@ var cloneProxy = new Proxy({}, {
 
 // Set the proxy: either just the MOAT, or all clones
 // TODO use a viewmodel for this
-var proxy = cloneProxy;
-// var proxy = t;
+let proxy = cloneProxy;
+// let proxy = t;
 
-// var sketch = {};
+// let sketch = {};
 // sketch.setup = function(p) {
 function setup(p) {
 	canvas = createCanvas(windowWidth, windowHeight);
@@ -640,7 +644,7 @@ function draw(p) {
 		stroke(255);
 		fill(255);
 		strokeWeight(0);
-		var m = message;
+		let m = message;
 		if (isMacroRecording) { m = 'Macro recording -- ' + m; }
 		text(m, 50, height - 50);
 		pop(); // }
@@ -662,13 +666,13 @@ function draw(p) {
  * .: penup()
  * \: show()/hide()
  */
-var countPrefix = 0;
-var macro = [];
-var macro_old = [];
-var isMacroRecording = false;
+let countPrefix = 0;
+let macro = [];
+let macro_old = [];
+let isMacroRecording = false;
 
 function parseKey(key) {
-	var addToMacro = true;
+	let addToMacro = true;
 
 	switch(key) {
 		// Special keys
@@ -722,7 +726,7 @@ function parseKey(key) {
 
 function keyPressed() {
 	// Only parse backspace
-	if (keyCode == BACKSPACE) {
+	if (keyCode === BACKSPACE) {
 		parseKey(keyCode);
 	}
 }
@@ -749,14 +753,14 @@ function playMacro() {
 	// Don't play the current macro when currently recording a macro
 	if (!isMacroRecording) { // TODO
 		logText('Playing macro: ' + macro.join(''));
-		for (var i in macro) {
+		for (let i in macro) {
 			parseKey(macro[i]);
 		}
 	}
 	// Play the old macro instead
 	else {
 		logText('Playing old macro: ' + macro_old);
-		for (var i in macro_old) {
+		for (let i in macro_old) {
 			parseKey(macro_old[i]);
 		}
 	}
