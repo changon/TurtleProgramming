@@ -1,4 +1,8 @@
-'use strict';
+import * as ace from 'brace';
+import * as Vue from 'vue';
+
+import * as models from './models';
+import './helpers';
 
 /* RequireJS config */
 // https://github.com/ajaxorg/ace/issues/1017
@@ -17,9 +21,7 @@ requirejs.config({
 */
 
 /* Load Ace editor */
-// var ace = require(['ace/ace']);
-
-var _editor = ace.edit('editor');
+const _editor = ace.edit('editor');
 // Options: https://github.com/ajaxorg/ace/wiki/Embedding-API
 _editor.setOptions({
 	// editor.renderer
@@ -30,13 +32,12 @@ _editor.setOptions({
 });
 
 // TODO
-_editor.getSession().setOptions({
-	mode: 'ace/mode/' + defaultLanguage
-});
+_editor.getSession()
+	.setMode('ace/mode/' + models.defaultLanguage);
 
 // Snippets
-// var snippetManager = require('ace/snippets').snippetManager;
-// var snippets = [
+// const snippetManager = require('ace/snippets').snippetManager;
+// const snippets = [
 // 	'snippet hello 	\n\t puts "it works!"'
 // ];
 // snippets.forEach((snippet) => {
@@ -45,7 +46,7 @@ _editor.getSession().setOptions({
 
 /* Window event listeners */
 // Resize listener
-window.addEventListener('resize', function () {
+window.addEventListener('resize', function() {
 	_editor.resize();
 	// TODO: resize p5 canvas as well
 });
@@ -53,59 +54,59 @@ window.addEventListener('resize', function () {
 /* Keybindings */
 // Save keybinding
 _editor.commands.addCommand({
-	name: 'save',
-	exec: function exec() {
+    name: 'save',
+    exec: function() {
 		saveToLocalStorage();
 	},
-	bindKey: { mac: 'Cmd-S', win: 'Ctrl-S' }
+    bindKey: { mac: 'Cmd-S', win: 'Ctrl-S' }
 });
 
 // Eval keybinding
 _editor.commands.addCommand({
-	name: 'eval',
-	exec: function exec() {
+    name: 'eval',
+    exec: function() {
 		evalSelectionOrLine(iframe);
 	},
-	bindKey: { mac: 'Cmd-Enter', win: 'Ctrl-Enter' }
+    bindKey: { mac: 'Cmd-Enter', win: 'Ctrl-Enter' }
 });
 
 // Load iframe
-var iframe = document.querySelector('#output-iframe');
+const iframe: HTMLIFrameElement = document.querySelector('#output-iframe') as HTMLIFrameElement;
 init_sandbox(iframe);
 
 // Load Vue viewmodels
-var _toolbar = new Vue({
+const _toolbar = new Vue({
 	el: '#toolbar',
 	data: {
-		supportedLanguages: supportedLanguages,
-		currentLanguage: defaultLanguage,
-		commandCatalog: commandCatalog,
-		programList: programList
+		supportedLanguages: models.supportedLanguages,
+		currentLanguage: models.defaultLanguage,
+		commandCatalog: models.commandCatalog,
+		programList: models.programList
 	},
 	computed: {
-		t: function t() {
-			// return iframe.contentWindow.t;
-			return iframe.contentWindow.proxy;
+		t: function() {
+			// return iframe.contentWindow['t'];
+			return iframe.contentWindow['proxy'];
 		}
 	},
 	methods: {
-		updateLanguage: function updateLanguage() {
-			var lang = this.currentLanguage;
+		updateLanguage: function() {
+			const lang = (this as any).currentLanguage;
 			console.log('Language changed to: ' + lang);
-			_editor.getSession().setOption('mode', 'ace/mode/' + lang);
+			_editor.getSession().setMode('ace/mode/' + lang);
 		},
-		insertCode: function insertCode(code) {
+		insertCode: function(code) {
 			// Since we don't have snippets implemented yet,
 			// just strip out the dollar signs
-			var sanitized = code.split(/\$[0-9]/).join('');
+			const sanitized = code.split(/\$[0-9]/).join('');
 			_editor.insert(sanitized);
 		},
-		loadSketch: function loadSketch(sketch) {
-			var url = './sketches/' + sketch.fileName;
+		loadSketch: function(sketch) {
+			const url = './sketches/' + sketch.fileName;
 			readFileFromURL(url);
 			if (sketch.language) {
-				this.currentLanguage = sketch.language;
-				this.updateLanguage();
+				(this as any).currentLanguage = sketch.language;
+				(this as any).updateLanguage();
 			}
 			if (sketch.autorun) {
 				evalAll();
@@ -115,43 +116,45 @@ var _toolbar = new Vue({
 		}
 	},
 	// TODO this should be wrapped in vm for ace, and run after ace loads
-	mounted: function mounted() {
+	mounted: function() {
 		// TODO rewrite using Backbone.router
-		var urlVars = getURLVars();
+		const urlVars = getURLVars();
 
 		// If a program is specified, load it
 		// Else, read from localStorage
-		var program = urlVars['program']; // || 'sketch';
+		const program = urlVars['program']; // || 'sketch';
 		if (program) {
-			var url = './sketches/' + program;
+			const url = './sketches/' + program;
 			readFileFromURL(url);
 			console.log('Read sketch from ' + url);
-		} else {
+		}
+		else {
 			readFromLocalStorage();
 		}
 
 		// TODO: merge with loadSketch()
 		// If a language is specified, check to make sure
 		// it is supported, and load it
-		var language = urlVars['language'];
-		if (language && language in supportedLanguages) {
+		const language = urlVars['language'];
+		if (language && language in models.supportedLanguages) {
 			console.log('Using language ' + language);
-			this.currentLanguage = language;
+			(this as any).currentLanguage = language;
 		}
 
-		this.updateLanguage();
+		(this as any).updateLanguage();
 
 		// TODO: merge with loadSketch()
 		// Autorun after a delay (this is so hackish)
 		// TODO replace with an event listener
 		if (urlVars['autorun']) {
 			console.log('Autorunning');
-			setTimeout(function () {
+			setTimeout(function() {
 				evalAll();
 			}, 2000);
 		}
 	}
 });
+
 
 // TODO add highlight
 // https://stackoverflow.com/questions/27531860/how-to-highlight-a-certain-line-in-ace-editor

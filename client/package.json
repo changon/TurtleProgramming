@@ -1,0 +1,19 @@
+{
+  "name": "turtle-programming-client",
+  "version": "1.0.0",
+  "author": "Kyle Feng",
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.2.3",
+    "babel-loader": "^7.1.2",
+    "pug-loader": "^2.3.0",
+    "source-map-loader": "^0.2.1",
+    "typescript": "^2.5.2"
+  },
+  "dependencies": {
+    "@types/ace": "0.0.35",
+    "@types/vue": "^2.0.0",
+    "brace": "^0.10.0",
+    "p5": "^0.5.14",
+    "vue": "^2.4.2"
+  }
+}

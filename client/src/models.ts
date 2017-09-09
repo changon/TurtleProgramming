@@ -1,9 +1,7 @@
-'use strict';
-
 // MVC stuff?
-var defaultLanguage = 'coffee';
+export const defaultLanguage = 'coffee';
 
-var supportedLanguages = {
+export const supportedLanguages = {
 	'javascript': 'JavaScript',
 	'coffee': 'CoffeeScript',
 	'ruby': 'Ruby',
@@ -12,7 +10,7 @@ var supportedLanguages = {
 };
 
 // TODO: turn into snippets
-var commandCatalog = [
+export const commandCatalog = [
 {
 	category: 'Turtle',
 	commands: [
@@ -58,7 +56,7 @@ var commandCatalog = [
 }
 ];
 
-var programList = [
+export const programList = [
 	{ name: 'Guess a Number', fileName: 'guess-a-number', language: 'coffee' },
 	{ name: 'Koch snowflake', fileName: 'koch-snowflake', language: 'ruby' },
 	{ name: 'B1A4 Good Timing', fileName: 'b1a4-good-timing', language: 'ruby', autorun: true },
