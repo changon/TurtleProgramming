@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <title>Sandbox</title>
-    <link rel="stylesheet" href="./resources/iframe-style.css">
+    <link rel="stylesheet" href="/dist/resources/iframe-style.css">
     <div id="test"></div>
     <!-- p5.js-->
-    <script type="text/javascript" src="./resources/p5.min.js"></script>
+    <script type="text/javascript" src="/dist/resources/p5.min.js"></script>
     <!-- script(type='text/javascript', src="./resources/p5.gibber.min.js")-->
     <!-- script.function setup() { window["setup1"](); } function draw() { window["draw1"](); }
     -->
@@ -15,12 +15,12 @@
     
     -->
     <!-- Coffeescript-->
-    <script type="text/javascript" src="./resources/coffee-script.js"></script>
+    <script type="text/javascript" src="/dist/resources/coffee-script.js"></script>
     <!-- TODO load opal asynchronously to not slow down page loading time-->
     <!-- Opal-->
-    <script type="text/javascript" src="./resources/opal.js"></script>
-    <script type="text/javascript" src="./resources/opal-parser.js"></script>
-    <script type="text/javascript" src="./resources/opal-native.js"></script>
+    <script type="text/javascript" src="/dist/resources/opal.js"></script>
+    <script type="text/javascript" src="/dist/resources/opal-parser.js"></script>
+    <script type="text/javascript" src="/dist/resources/opal-native.js"></script>
     <script type="text/javascript">Opal.load("opal-parser")</script>
     <!-- Skulpt-->
     <script type="text/javascript" src="http://www.skulpt.org/static/skulpt.min.js"></script>
@@ -44,15 +44,16 @@
     </script>
     <!-- Starlight-->
     <!-- script(src='//cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js')-->
-    <script src="./resources/starlight.js" data-run-script-tags></script>
+    <script src="/dist/resources/starlight.js" data-run-script-tags></script>
     <!-- Please JS-->
     <script type="text/javascript" src="http://www.checkman.io/please/js/Please-compressed.js"></script>
     <!-- Turtle-->
-    <script type="text/javascript" src="./src/turtle.js"></script>
-    <script type="text/javascript" src="./src/turtle-helpers.js"></script>
-    <script type="text/ruby" src="./src/turtle-opal.rb"></script>
-    <script type="text/javascript" src="./src/turtle-skulpt.js"></script>
-    <script type="text/lua" src="./src/turtle-starlight.lua"></script>
+    <!-- <script type="text/javascript" src="./src/turtle.js"></script> -->
+    <!-- <script type="text/javascript" src="./src/turtle-helpers.js"></script> -->
+    <script type="text/javascript" src="/dist/turtle.bundle.js"></script>
+    <script type="text/ruby" src="/src/turtle-opal.rb"></script>
+    <script type="text/javascript" src="/src/turtle-skulpt.js"></script>
+    <script type="text/lua" src="/src/turtle-starlight.lua"></script>
   </head>
   <body></body>
 </html>

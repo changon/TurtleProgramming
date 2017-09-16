@@ -1,3 +1,5 @@
+import * as Promise from 'bluebird';
+
 declare const p5: any;
 
 // TODO use async/await
@@ -240,7 +242,7 @@ export class Turtle {
 	_killClones() {
 		while (this._clones.length > 0) { this._clones.pop(); }
 	}
-	
+
 	// Recursively merge clones' vertices, and kill the clones
 	_mergeClones() {
 		let all = this._all();
@@ -249,12 +251,12 @@ export class Turtle {
 		this._vertices = vertices;
 		this.killClones();
 	}
-	
+
 	// Sleep
 	_sleep(ms) {
 		return new Promise((resolve) => setTimeout(resolve, ms));
 	}
-	
+
 	/* Turtle commands */
 	// Move and draw
 	forward(n) { return this._addCommand('forward', n); };
@@ -264,10 +266,10 @@ export class Turtle {
 	setxy(x, y) { return this._addCommand('setxy', [x, y]); }
 	setheading(ang) { return this._addCommand('setheading', ang); }
 	write(str) { return this._addCommand('write', str); }
-	
+
 	push() { return this._addCommand('push'); };
 	pop() { return this._addCommand('pop'); };
-	
+
 	// Drawing state
 	show() { return this._addCommand('show'); }
 	hide() { return this._addCommand('hide'); }
@@ -276,17 +278,17 @@ export class Turtle {
 	penup() { return this._addCommand('penup'); }
 	color(...args) { return this._addCommand('setcolor', args); }
 	width(n) { return this._addCommand('setwidth', n); }
-	
+
 	reset() { return this._addCommand('reset'); }
-	
+
 	// Cloning
 	clone() { return this._addCommand('clone'); }
 	killClones() { return this._addCommand('killClones'); }
 	mergeClones() { return this._addCommand('mergeClones'); }
-	
+
 	// TODO: commandHistory, undo
 	// Immutable state?
-	
+
 	_update() {
 		// If turtle is visible, do all the fancy animation stuff
 		if (this._isVisible) {
@@ -294,11 +296,11 @@ export class Turtle {
 			let x_eq = this._x_new === this._x;
 			let y_eq = this._y_new === this._y;
 			let ang_eq = Math.abs(this._ang_new - this._ang) < 1;
-		
+
 			// If it has, then execute the next command
 			if (x_eq && y_eq && ang_eq) {
 				this._ang = this._ang_new;
-			
+
 				this._commandFinished = true;
 				this._executeNextCommand();
 			}
@@ -307,14 +309,14 @@ export class Turtle {
 				let diff = new p5.Vector(this._x_new - this._x, this._y_new - this._y);
 				let dist = diff.mag();
 				let dir = diff.normalize(); // destructive
-			
+
 				// Set them equal to the new values if closer than scale
 				if (dist < this._scale) this._x = this._x_new; else this._x += this._scale * dir.x;
 				if (dist < this._scale) this._y = this._y_new; else this._y += this._scale * dir.y;
-			
-				this._ang = p5.lerp(this._ang, this._ang_new, 0.5);
+
+				this._ang = p.lerp(this._ang, this._ang_new, 0.5);
 			}
-		
+
 		}
 		// Otherwise just do it the boring way
 		else {
@@ -326,28 +328,28 @@ export class Turtle {
 				this._ang = this._ang_new;
 			}
 		}
-	
+
 		// Update clones
 		this._clones.forEach(function(clone, i) {
 			clone._update();
 		})
 	}
-	
+
 	_draw() {
 		// Make relative to origin
-		p5.push(); // {
-		p5.translate(p5.width / 2, p5.height / 2);
+		p.push(); // {
+		p.translate(p.width / 2, p.height / 2);
 
 		// TODO perspective?
 
 		//_ Draw vertices
 		// TODO: rename this._vertices
 		for (let i = 0; i < this._vertices.length; i++) {
-			p5.push(); // {
+			p.push(); // {
 			let vertex = this._vertices[i];
 			if (vertex.type === 'point') {
-				p5.stroke(vertex.color);
-				p5.strokeWeight(vertex.width);
+				p.stroke(vertex.color);
+				p.strokeWeight(vertex.width);
 
 				let [x1, y1] = vertex.from;
 				let x2, y2;
@@ -359,69 +361,69 @@ export class Turtle {
 					[x2, y2] = vertex.to;
 				}
 
-				p5.line(x1, -y1, x2, -y2);
+				p.line(x1, -y1, x2, -y2);
 			}
 			else if (vertex.type === 'text') {
-				p5.noStroke();
-				p5.fill(vertex.color);
-				p5.text(vertex.str, vertex.at[0], -vertex.at[1]);
+				p.noStroke();
+				p.fill(vertex.color);
+				p.text(vertex.str, vertex.at[0], -vertex.at[1]);
 			}
 			// ignore void
 
-			p5.pop(); // }
+			p.pop(); // }
 		}
 
 		// Now make relative to turtle
-		p5.push(); // {
-		p5.translate(this._x, -this._y);
-		p5.rotate(-p5.radians(this._ang));
+		p.push(); // {
+		p.translate(this._x, -this._y);
+		p.rotate(-p.radians(this._ang));
 
 		// Draw turtle
 		if (this._isVisible) {
-			// p5.stroke(0, 0, 0, 127);
-			p5.stroke(this._color, this._color, this._color, 127);
-			// p5.noFill();
-			p5.fill(this._color);
-			// p5.triangle(5, 0, -5, 4, -5, -4);
-			p5.quad(5, 0, -5, 4, -3, 0, -5, -4);
-			p5.noFill();
+			// p.stroke(0, 0, 0, 127);
+			p.stroke(this._color, this._color, this._color, 127);
+			// p.noFill();
+			p.fill(this._color);
+			// p.triangle(5, 0, -5, 4, -5, -4);
+			p.quad(5, 0, -5, 4, -3, 0, -5, -4);
+			p.noFill();
 		}
 
-		p5.pop(); // }
+		p.pop(); // }
 
-		p5.pop(); // }
+		p.pop(); // }
 
 		// Draw clones
 		this._clones.forEach(function (clone, i) {
 			clone._draw();
 		})
 	}
-	
+
 	_executeNextCommand() {
 		// Get next command in command queue
 		let command = this._commandQueue.pop();
 		if (command) {
 			this._commandFinished = false;
 			let { cmd, args, resolve, reject } = command;
-		
+
 			// Unwrap promise and pass it on to the next if statement
 			if (typeof args === 'object' && args instanceof PromiseWrapper) {
 				args = args.valueOf;
 			}
-		
+
 			// Unwrap function
 			// This is essentially lazy evaluation
 			if (typeof args === 'function') {
 				args = args();
 			}
-		
+
 			switch (cmd) {
 				case 'forward':
 					if (typeof args !== 'number') { reject(); }
 					else {
 						logText('Forward ' + args);
-						this._x_new = this._x + args * Math.cos(p5.radians(this._ang));
-						this._y_new = this._y + args * Math.sin(p5.radians(this._ang));
+						this._x_new = this._x + args * Math.cos(p.radians(this._ang));
+						this._y_new = this._y + args * Math.sin(p.radians(this._ang));
 						this._addVertex();
 						resolve();
 					}
@@ -430,8 +432,8 @@ export class Turtle {
 					if (typeof args !== 'number') { reject(); }
 					else {
 						logText('Backward ' + args);
-						this._x_new = this._x - args * Math.cos(p5.radians(this._ang));
-						this._y_new = this._y - args * Math.sin(p5.radians(this._ang));
+						this._x_new = this._x - args * Math.cos(p.radians(this._ang));
+						this._y_new = this._y - args * Math.sin(p.radians(this._ang));
 						this._addVertex();
 						resolve();
 					}
@@ -509,7 +511,7 @@ export class Turtle {
 					break;
 				case 'setcolor':
 					logText('Set color to ' + args);
-					this._color = p5.color(...args); // wrap using p5.Color
+					this._color = p.color(...args); // wrap using p5.Color
 					resolve();
 					break;
 				case 'setwidth':
@@ -519,7 +521,7 @@ export class Turtle {
 					break;
 				case 'reset':
 					logText('Reset');
-				
+
 					// clear(); setxy(0, 0); setheading(90);
 					this._vertices.length = 0;
 					this._ang = this._ang_new = 90;
@@ -529,32 +531,32 @@ export class Turtle {
 					break;
 				case 'stop':
 					logText('Stop');
-				
+
 					// Reset command queue
 					// Why doesn't this work? this._commandQueue.length = 0;
 					while (this._commandQueue.length > 0) { this._commandQueue.pop(); }
 					resolve();
 					break;
-				
+
 				// Cloning
 				case 'clone':
 					logText('Clone');
 					let clone = this._clone();
 					resolve(clone);
 					break;
-				
+
 				case 'killClones':
 					logText('Kill clones');
 					this._killClones();
 					resolve();
 					break;
-				
+
 				case 'mergeClones':
 					logText('Merge clones');
 					this._mergeClones();
 					resolve();
 					break;
-				
+
 				// Getters
 				// TODO: cleanup
 				// clones, color, width, parent
@@ -566,7 +568,7 @@ export class Turtle {
 				case 'getwidth': resolve(this._width); break;
 				case 'getIsPenDown': resolve(this._isPenDown); break;
 				case 'getIsVisible': resolve(this._isVisible); break;
-				
+
 				case 'call':
 					// Function is passed as an argument
 					let fn = args;
@@ -575,7 +577,7 @@ export class Turtle {
 			}
 		}
 	}
-	
+
 	_debug = function() {
 		if (this.isDebug) {
 			let s = '';
@@ -583,8 +585,8 @@ export class Turtle {
 			s += 'Heading: ' + this._ang + '\n';
 			s += 'New position' + [this._x_new, this._y_new] + '\n';
 			s += 'New heading' + this._ang_new + '\n';
-		
-			p5.text(s, 50, 50); // TODO change coords, fix multiline
+
+			p.text(s, 50, 50); // TODO change coords, fix multiline
 		}
 	}
 }
@@ -616,11 +618,11 @@ Turtle.prototype['down'] = Turtle.prototype.pendown;
 
 Turtle.prototype['goto!'] = Turtle.prototype['setxy!'];
 Turtle.prototype['seth!'] = Turtle.prototype['setheading!'];
-	
+
 // isX -> x?
 Object.defineProperty(Turtle.prototype, 'pendown?', { get: function () { return this.isPenDown; } });
 Object.defineProperty(Turtle.prototype, 'visible?', { get: function () { return this.isVisible; } });
-	
+
 // Getters
 // TODO define dynamically?
 // TODO make set call the respective set command?
@@ -631,12 +633,13 @@ Object.defineProperty(Turtle.prototype, 'color', { get: function() { return this
 Object.defineProperty(Turtle.prototype, 'width', { get: function() { return this._addCommand('getwidth'); } });
 Object.defineProperty(Turtle.prototype, 'isPenDown', { get: function() { return this._addCommand('getIsPenDown'); } });
 Object.defineProperty(Turtle.prototype, 'isVisible', { get: function() { return this._addCommand('getVisible'); } });
-	
+
 
 /******************************************************************************/
 
 // This is the mother of all turtles (MOAT)
 export let t: Turtle = new Turtle();
+window['t'] = t;
 export let canvas;
 export let bgcolor = 0; // 200, 64
 export let message = '';
@@ -664,44 +667,58 @@ export let cloneProxy: Turtle = new Proxy({}, {
 let proxy = cloneProxy;
 // let proxy = t;
 
-// let sketch = {};
-// sketch.setup = function(p) {
-function setup(p) {
-	canvas = p5.createCanvas(p5.windowWidth, p5.windowHeight);
-	p5.background(bgcolor);
-	p5.textFont('Helvetica');
-	p5.strokeCap(p5.PROJECT);
+let sketch = function(p: any) {
+	// function setup() {
+	p.setup = function() {
+		canvas = p.createCanvas(p.windowWidth, p.windowHeight);
+		p.background(bgcolor);
+		p.textFont('Helvetica');
+		p.strokeCap(p.PROJECT);
 
-	t._update();
-	t._draw();
-}
-
-// sketch.draw = function(p) {
-function draw(p) {
-	// Redraw only if dirty
-	if (!t._commandFinished) {
-		// Clear canvas
-		p5.background(bgcolor);
-
+		t._update();
 		t._draw();
-		t._debug();
+	};
 
-		// TODO change coords. change to div?
-		p5.push(); // {
-		p5.stroke(255);
-		p5.fill(255);
-		p5.strokeWeight(0);
-		let m = message;
-		if (isMacroRecording) { m = 'Macro recording -- ' + m; }
-		p5.text(m, 50, p5.height - 50);
-		p5.pop(); // }
+	// function draw() {
+	p.draw = function() {
+		// Redraw only if dirty
+		if (!t._commandFinished) {
+			// Clear canvas
+			p.background(bgcolor);
+
+			t._draw();
+			t._debug();
+
+			// TODO change coords. change to div?
+			p.push(); // {
+			p.stroke(255);
+			p.fill(255);
+			p.strokeWeight(0);
+			let m = message;
+			if (isMacroRecording) { m = 'Macro recording -- ' + m; }
+			p.text(m, 50, p.height - 50);
+			p.pop(); // }
+		}
+
+		t._update();
+	};
+
+	p.keyPressed = function() {
+		// Only parse backspace
+		if (p.keyCode === p.BACKSPACE) {
+			parseKey(p.keyCode);
+		}
+	};
+
+	p.keyTyped = function() {
+		parseKey(p.key);
+		// TODO why doesn't key repeat work?
 	}
 
-	t._update();
 }
 
 // Initialize instance mode
-// new p5(sketch);
+let p = new p5(sketch);
 
 /* Interative etch-a-sketch mode
  * Specify count with number keys (0-9)
@@ -723,7 +740,7 @@ function parseKey(key) {
 
 	switch(key) {
 		// Special keys
-		case p5.BACKSPACE:
+		case p.BACKSPACE:
 			countPrefix = 0;
 			logText('Count prefix: ' + countPrefix);
 			break;
@@ -756,7 +773,7 @@ function parseKey(key) {
 			break;
 
 		case '@':
-			p5.repeat(countPrefix ? countPrefix : 1, function() { playMacro(); });
+			p.repeat(countPrefix ? countPrefix : 1, function() { playMacro(); });
 			addToMacro = false;
 			break;
 
@@ -769,18 +786,6 @@ function parseKey(key) {
 	if (addToMacro) {
 		macro.push(key);
 	}
-}
-
-function keyPressed() {
-	// Only parse backspace
-	if (p5.keyCode === p5.BACKSPACE) {
-		parseKey(p5.keyCode);
-	}
-}
-
-function keyTyped() {
-	parseKey(p5.key);
-	// TODO why doesn't key repeat work?
 }
 
 // TODO: make macros not based on keypress

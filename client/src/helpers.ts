@@ -1,9 +1,19 @@
-'use strict';
+import * as brace from 'brace';
+
+declare const _editor: brace.Editor;
+declare const iframe: HTMLIFrameElement;
+declare const _toolbar: any;
+declare const $: any;
+
+interface RenderResult {
+	compiledCode: string;
+	returnValue: string;
+}
 
 // Get contents stored in localStorage
 // TODO use jquery?
-function readFromLocalStorage() {
-	var data = localStorage.getItem('editor_contents');
+export function readFromLocalStorage(): boolean {
+	const data = localStorage.getItem('editor_contents');
 	if (data) {
 		_editor.setValue(data, -1); // Replace everything
 		return true;
@@ -13,14 +23,14 @@ function readFromLocalStorage() {
 	}
 }
 
-function saveToLocalStorage() {
+export function saveToLocalStorage() {
 	console.log('Saving...')
-	var data = _editor.getValue();
+	const data = _editor.getValue();
 	localStorage.setItem('editor_contents', data);
 }
 
 // Get contents of sketch.js without running
-function readFileFromURL(url) {
+export function readFileFromURL(url) {
 	$.get(url, function(data) {
 		_editor.setValue(data, -1); // Replace everything
 	}, 'text');
@@ -28,10 +38,11 @@ function readFileFromURL(url) {
 
 // Read a page's GET URL variables and return them as an associative array.
 // From http://stackoverflow.com/a/4656873
-function getURLVars() {
-	var vars = [], hash;
-	var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-	for(var i = 0; i < hashes.length; i++) {
+export function getURLVars() {
+	let vars = [];
+	let hash;
+	const hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+	for(let i = 0; i < hashes.length; i++) {
 		hash = hashes[i].split('=');
 		vars.push(hash[0]);
 		vars[hash[0]] = hash[1];
@@ -39,26 +50,26 @@ function getURLVars() {
 	return vars;
 }
 
-function evalSelectionOrLine(iframe) {
+export function evalSelectionOrLine(iframe) {
 	// Get selection, otherwise get current line
 	// TODO flash code on run
-	var code = _editor.getSelectedText();
+	let code = (_editor as any).getSelectedText();
 	code = code ? code : _editor.session.getLine(_editor.getCursorPosition().row);
 
 	render(iframe, code);
 }
 
-function evalAll() {
+export function evalAll() {
 	// TODO: flash code
-	var code = _editor.getValue();
+	const code = _editor.getValue();
 	render(iframe, code);
 }
 
-function render(iframe, code) {
+export function render(iframe, code) {
 	// Use iframe's contentWindow as namespace
-	var w = iframe.contentWindow;
+	const w = iframe.contentWindow;
 
-	var result = {};
+	let result: RenderResult;
 
 	switch (_toolbar.currentLanguage) {
 	case 'javascript':
@@ -76,7 +87,7 @@ function render(iframe, code) {
 		result.returnValue = w.eval(result.compiledCode);
 		break;
 	case 'python':
-		var myPromise = w.Sk.misceval.asyncToPromise(function() {
+		const myPromise = w.Sk.misceval.asyncToPromise(function() {
 			return w.Sk.importMainWithBody('repl', false, code, true);
 		});
 		myPromise.then(function(mod) {
@@ -96,11 +107,11 @@ function render(iframe, code) {
 	console.log('Executing code', result);
 }
 
-function init_sandbox(iframe) {
+export function init_sandbox(iframe) {
 	// Probably should make sure there are no memory leaks or anything...
 
 	// Inject some HTML into the iframe
-	// var html = ...
+	// let html = ...
 
 	// Write to iframe
 	// iframe.contentDocument.open();
@@ -111,6 +122,6 @@ function init_sandbox(iframe) {
 	// iframe.src = './iframe-sandbox.html';
 
 	// Export iframe's contentWindow to main window
-	window.w = iframe.contentWindow;
+	window['w'] = iframe.contentWindow;
 
 }

@@ -1,8 +1,12 @@
 module.exports = {
-	entry: "./src/main.ts",
+	entry: {
+		"main.bundle": "./src/main.ts",
+		"turtle.bundle": "./src/turtle.ts",
+	},
 	output: {
 		path: __dirname + '/dist',
-		filename: "bundle.js"
+		filename: "[name].js",
+		publicPath: "/dist"
 	},
 
 	// Enable sourcemaps for debugging webpack's output.

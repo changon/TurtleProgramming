@@ -2,7 +2,7 @@ import * as ace from 'brace';
 import * as Vue from 'vue';
 
 import * as models from './models';
-import './helpers';
+import * as helpers from './helpers';
 
 /* RequireJS config */
 // https://github.com/ajaxorg/ace/issues/1017
@@ -56,7 +56,7 @@ window.addEventListener('resize', function() {
 _editor.commands.addCommand({
     name: 'save',
     exec: function() {
-		saveToLocalStorage();
+		helpers.saveToLocalStorage();
 	},
     bindKey: { mac: 'Cmd-S', win: 'Ctrl-S' }
 });
@@ -65,14 +65,14 @@ _editor.commands.addCommand({
 _editor.commands.addCommand({
     name: 'eval',
     exec: function() {
-		evalSelectionOrLine(iframe);
+		helpers.evalSelectionOrLine(iframe);
 	},
     bindKey: { mac: 'Cmd-Enter', win: 'Ctrl-Enter' }
 });
 
 // Load iframe
 const iframe: HTMLIFrameElement = document.querySelector('#output-iframe') as HTMLIFrameElement;
-init_sandbox(iframe);
+helpers.init_sandbox(iframe);
 
 // Load Vue viewmodels
 const _toolbar = new Vue({
@@ -103,13 +103,13 @@ const _toolbar = new Vue({
 		},
 		loadSketch: function(sketch) {
 			const url = './sketches/' + sketch.fileName;
-			readFileFromURL(url);
+			helpers.readFileFromURL(url);
 			if (sketch.language) {
 				(this as any).currentLanguage = sketch.language;
 				(this as any).updateLanguage();
 			}
 			if (sketch.autorun) {
-				evalAll();
+				helpers.evalAll();
 				console.log('Autorunning');
 			}
 			console.log('Load sketch ' + sketch.name + ' from ' + url);
@@ -118,18 +118,18 @@ const _toolbar = new Vue({
 	// TODO this should be wrapped in vm for ace, and run after ace loads
 	mounted: function() {
 		// TODO rewrite using Backbone.router
-		const urlVars = getURLVars();
+		const urlVars = helpers.getURLVars();
 
 		// If a program is specified, load it
 		// Else, read from localStorage
 		const program = urlVars['program']; // || 'sketch';
 		if (program) {
 			const url = './sketches/' + program;
-			readFileFromURL(url);
+			helpers.readFileFromURL(url);
 			console.log('Read sketch from ' + url);
 		}
 		else {
-			readFromLocalStorage();
+			helpers.readFromLocalStorage();
 		}
 
 		// TODO: merge with loadSketch()
@@ -149,7 +149,7 @@ const _toolbar = new Vue({
 		if (urlVars['autorun']) {
 			console.log('Autorunning');
 			setTimeout(function() {
-				evalAll();
+				helpers.evalAll();
 			}, 2000);
 		}
 	}
@@ -160,7 +160,7 @@ const _toolbar = new Vue({
 // https://stackoverflow.com/questions/27531860/how-to-highlight-a-certain-line-in-ace-editor
 
 // Save timer
-window.setInterval(saveToLocalStorage, 30000);
+window.setInterval(helpers.saveToLocalStorage, 30000);
 
 /*
 TODO mousetrap?
