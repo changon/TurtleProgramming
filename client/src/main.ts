@@ -4,24 +4,21 @@ import * as Vue from 'vue';
 import * as models from './models';
 import * as helpers from './helpers';
 
-/* RequireJS config */
-// https://github.com/ajaxorg/ace/issues/1017
-/*
-requirejs.config({
-	baseUrl: window.location.protocol + "//" + window.location.host
-		+ window.location.pathname.split("/").slice(0, -1).join("/"),
-
-	paths: {
-		'ace': [
-			'https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js',
-			'https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js'
-		]
-	}
-});
-*/
+declare function require(path: string): any;
 
 /* Load Ace editor */
-const _editor = ace.edit('editor');
+// Load languages
+for (let language of Object.keys(models.supportedLanguages)) {
+	require('brace/mode/' + language);
+	require('brace/snippets/' + language);
+}
+import 'brace/theme/monokai';
+import 'brace/ext/language_tools';
+import 'brace/snippets/text'; // not sure why this is needed
+ace.acequire('ace/ext/language_tools');
+
+// Initialize editor
+export const _editor = ace.edit('editor');
 // Options: https://github.com/ajaxorg/ace/wiki/Embedding-API
 _editor.setOptions({
 	// editor.renderer
@@ -30,6 +27,11 @@ _editor.setOptions({
 	enableLiveAutocompletion: false,
 	enableSnippets: true
 });
+
+// This is to remove following warning message on console:
+// Automatically scrolling cursor into view after selection change this will be disabled in the next version
+// set editor.$blockScrolling = Infinity to disable this message
+_editor.$blockScrolling = Infinity;
 
 // TODO
 _editor.getSession()
@@ -54,20 +56,20 @@ window.addEventListener('resize', function() {
 /* Keybindings */
 // Save keybinding
 _editor.commands.addCommand({
-    name: 'save',
-    exec: function() {
-		helpers.saveToLocalStorage();
+	name: 'save',
+	exec: function() {
+		helpers.saveToLocalStorage(_editor);
 	},
-    bindKey: { mac: 'Cmd-S', win: 'Ctrl-S' }
+	bindKey: { mac: 'Cmd-S', win: 'Ctrl-S' }
 });
 
 // Eval keybinding
 _editor.commands.addCommand({
-    name: 'eval',
-    exec: function() {
-		helpers.evalSelectionOrLine(iframe);
+	name: 'eval',
+	exec: function() {
+		helpers.evalSelectionOrLine(_editor, iframe);
 	},
-    bindKey: { mac: 'Cmd-Enter', win: 'Ctrl-Enter' }
+	bindKey: { mac: 'Cmd-Enter', win: 'Ctrl-Enter' }
 });
 
 // Load iframe
@@ -75,7 +77,7 @@ const iframe: HTMLIFrameElement = document.querySelector('#output-iframe') as HT
 helpers.init_sandbox(iframe);
 
 // Load Vue viewmodels
-const _toolbar = new Vue({
+export const _toolbar = new Vue({
 	el: '#toolbar',
 	data: {
 		supportedLanguages: models.supportedLanguages,
@@ -102,14 +104,14 @@ const _toolbar = new Vue({
 			_editor.insert(sanitized);
 		},
 		loadSketch: function(sketch) {
-			const url = './sketches/' + sketch.fileName;
-			helpers.readFileFromURL(url);
+			const url = '/sketches/' + sketch.fileName;
+			helpers.readFileFromURL(_editor, url);
 			if (sketch.language) {
 				(this as any).currentLanguage = sketch.language;
 				(this as any).updateLanguage();
 			}
 			if (sketch.autorun) {
-				helpers.evalAll();
+				helpers.evalAll(_editor, iframe);
 				console.log('Autorunning');
 			}
 			console.log('Load sketch ' + sketch.name + ' from ' + url);
@@ -124,12 +126,12 @@ const _toolbar = new Vue({
 		// Else, read from localStorage
 		const program = urlVars['program']; // || 'sketch';
 		if (program) {
-			const url = './sketches/' + program;
-			helpers.readFileFromURL(url);
+			const url = '/sketches/' + program;
+			helpers.readFileFromURL(_editor, url);
 			console.log('Read sketch from ' + url);
 		}
 		else {
-			helpers.readFromLocalStorage();
+			helpers.readFromLocalStorage(_editor);
 		}
 
 		// TODO: merge with loadSketch()
@@ -149,11 +151,14 @@ const _toolbar = new Vue({
 		if (urlVars['autorun']) {
 			console.log('Autorunning');
 			setTimeout(function() {
-				helpers.evalAll();
+				helpers.evalAll(_editor, iframe);
 			}, 2000);
 		}
 	}
 });
+
+// TODO don't use globals
+window['_toolbar'] = _toolbar;
 
 
 // TODO add highlight

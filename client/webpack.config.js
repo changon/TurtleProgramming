@@ -1,12 +1,21 @@
+const path = require('path');
+
 module.exports = {
 	entry: {
-		"main.bundle": "./src/main.ts",
-		"turtle.bundle": "./src/turtle.ts",
+		"main": "./src/main.ts",
+		"turtle": "./src/turtle.ts",
 	},
 	output: {
-		path: __dirname + '/dist',
-		filename: "[name].js",
-		publicPath: "/dist"
+		path: path.join(__dirname, '/dist'),
+		filename: "[name].bundle.js",
+		publicPath: "/dist",
+		library: "[name]"
+	},
+
+	externals: {
+		"jquery": "$",
+		"vue": "Vue",
+		"bluebird": "Promise"
 	},
 
 	// Enable sourcemaps for debugging webpack's output.

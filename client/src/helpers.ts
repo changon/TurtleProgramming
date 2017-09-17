@@ -1,9 +1,10 @@
-import * as brace from 'brace';
+import * as ace from 'brace';
 
-declare const _editor: brace.Editor;
-declare const iframe: HTMLIFrameElement;
+// TODO don't use globals
 declare const _toolbar: any;
-declare const $: any;
+
+// TODO replace jquery with axios, since we only use it for AJAX calls
+import * as $ from 'jquery';
 
 interface RenderResult {
 	compiledCode: string;
@@ -12,7 +13,7 @@ interface RenderResult {
 
 // Get contents stored in localStorage
 // TODO use jquery?
-export function readFromLocalStorage(): boolean {
+export function readFromLocalStorage(_editor: ace.Editor): boolean {
 	const data = localStorage.getItem('editor_contents');
 	if (data) {
 		_editor.setValue(data, -1); // Replace everything
@@ -23,14 +24,14 @@ export function readFromLocalStorage(): boolean {
 	}
 }
 
-export function saveToLocalStorage() {
+export function saveToLocalStorage(_editor: ace.Editor) {
 	console.log('Saving...')
 	const data = _editor.getValue();
 	localStorage.setItem('editor_contents', data);
 }
 
 // Get contents of sketch.js without running
-export function readFileFromURL(url) {
+export function readFileFromURL(_editor: ace.Editor, url) {
 	$.get(url, function(data) {
 		_editor.setValue(data, -1); // Replace everything
 	}, 'text');
@@ -50,7 +51,7 @@ export function getURLVars() {
 	return vars;
 }
 
-export function evalSelectionOrLine(iframe) {
+export function evalSelectionOrLine(_editor: ace.Editor, iframe: HTMLIFrameElement) {
 	// Get selection, otherwise get current line
 	// TODO flash code on run
 	let code = (_editor as any).getSelectedText();
@@ -59,55 +60,68 @@ export function evalSelectionOrLine(iframe) {
 	render(iframe, code);
 }
 
-export function evalAll() {
+export function evalAll(_editor: ace.Editor, iframe: HTMLIFrameElement) {
 	// TODO: flash code
 	const code = _editor.getValue();
 	render(iframe, code);
 }
 
-export function render(iframe, code) {
+export function render(iframe: HTMLIFrameElement, code) {
 	// Use iframe's contentWindow as namespace
-	const w = iframe.contentWindow;
+	const w: any = iframe.contentWindow;
 
 	let result: RenderResult;
 
 	switch (_toolbar.currentLanguage) {
-	case 'javascript':
-		result.compiledCode = code;
-		result.returnValue = w.eval(result.compiledCode);
+	case 'javascript': {
+		// Currently JavaScript is run as is, without sanitization or preprocessing with Babel or anything
+		result = {
+			compiledCode: code,
+			returnValue: w.eval(code)
+		};
 		break;
-	case 'coffee':
-		result.compiledCode = w.CoffeeScript.compile(code);
+	}
+	case 'coffee': {
+		let compiledCode = w.CoffeeScript.compile(code);
 		// Strip out the first and last lines, so that it is no longer wrapped in a closure
-		result.compiledCode = result.compiledCode.split('\n').slice(1,-2).join('\n'); // two newlines at the end
-		result.returnValue = w.eval(result.compiledCode);
+		compiledCode = compiledCode.split('\n').slice(1,-2).join('\n'); // two newlines at the end
+		let returnValue = w.eval(compiledCode);
+		result = { compiledCode, returnValue };
 		break;
-	case 'ruby':
-		result.compiledCode = w.Opal.compile(code);
-		result.returnValue = w.eval(result.compiledCode);
+	}
+	case 'ruby': {
+		let compiledCode = w.Opal.compile(code);
+		let returnValue = w.eval(compiledCode);
+		result = { compiledCode, returnValue };
 		break;
-	case 'python':
+	}
+	case 'python': {
 		const myPromise = w.Sk.misceval.asyncToPromise(function() {
 			return w.Sk.importMainWithBody('repl', false, code, true);
 		});
 		myPromise.then(function(mod) {
-			result.compiledCode = mod.$js;
-			result.returnValue = mod.$d;
+			result = {
+				compiledCode: mod.$js,
+				returnValue: mod.$d
+			};
 		}, function(err) {
 			console.error(err.toString());
 		});
 		break;
-	case 'lua':
-		result.compiledCode = w.starlight.parser.parseToString(code);
-		console.log(result.compiledCode);
-		result.returnValue = w.starlight.parser.parse(code)();
+	}
+	case 'lua': {
+		let compiledCode = w.starlight.parser.parseToString(code);
+		let returnValue = w.starlight.parser.parse(code)();
+		result = { compiledCode, returnValue };
+		// console.log(result.compiledCode);
 		break;
+	}
 	}
 
 	console.log('Executing code', result);
 }
 
-export function init_sandbox(iframe) {
+export function init_sandbox(iframe: HTMLIFrameElement) {
 	// Probably should make sure there are no memory leaks or anything...
 
 	// Inject some HTML into the iframe

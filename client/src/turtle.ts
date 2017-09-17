@@ -638,7 +638,7 @@ Object.defineProperty(Turtle.prototype, 'isVisible', { get: function() { return 
 /******************************************************************************/
 
 // This is the mother of all turtles (MOAT)
-export let t: Turtle = new Turtle();
+export const t: Turtle = new Turtle();
 window['t'] = t;
 export let canvas;
 export let bgcolor = 0; // 200, 64
@@ -664,8 +664,9 @@ export let cloneProxy: Turtle = new Proxy({}, {
 
 // Set the proxy: either just the MOAT, or all clones
 // TODO use a viewmodel for this
-let proxy = cloneProxy;
-// let proxy = t;
+export const proxy: Turtle = cloneProxy;
+window['proxy'] = proxy;
+// const proxy = t;
 
 let sketch = function(p: any) {
 	// function setup() {
@@ -718,7 +719,7 @@ let sketch = function(p: any) {
 }
 
 // Initialize instance mode
-let p = new p5(sketch);
+export const p = new p5(sketch);
 
 /* Interative etch-a-sketch mode
  * Specify count with number keys (0-9)

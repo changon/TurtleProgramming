@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "author": "Kyle Feng",
   "devDependencies": {
+    "@types/jquery": "^3.2.12",
     "awesome-typescript-loader": "^3.2.3",
     "babel-loader": "^7.1.2",
     "pug-loader": "^2.3.0",
@@ -15,6 +16,7 @@
     "@types/vue": "^2.0.0",
     "bluebird": "^3.5.0",
     "brace": "^0.10.0",
+    "jquery": "^3.2.1",
     "p5": "^0.5.14",
     "vue": "^2.4.2"
   }

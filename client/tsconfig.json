@@ -9,7 +9,7 @@
 		"lib": [
 			"es2016",
 			"dom"
-		]
+		],
 		"jsx": "react"
 	},
 	"include": [
