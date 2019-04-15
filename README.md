@@ -121,3 +121,8 @@ http://www.di.unito.it/~barbara/MicRobot/AttiEuroLogo2007/proceedings/W-Foltynow
 [Ramda two-pane editor](http://ramdajs.com/repl)
 
 [Bootstrap + Ace editor](http://www.bootply.com/hYVxKShFtM)
+
+Pencil Code: very similar concept of using turtle graphics, but with a visual programming editor
+http://pencilcode.net/edit/first
+
+http://cwestblog.com/2016/03/16/javascript-detecting-infinite-loops/
